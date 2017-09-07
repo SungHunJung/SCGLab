@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <attr name="emptyImage" format="reference"/>
+
+    <declare-styleable name="ResizedImageView">
+        <attr name="emptyImage"/>
+    </declare-styleable>
+
+    <declare-styleable name="NetworkImageView">
+        <attr name="emptyImage"/>
+    </declare-styleable>
+
+    <declare-styleable name="CircleImageView">
+        <attr name="emptyImage"/>
+        <attr name="circleSize" format="integer"/>
+        <attr name="frameColor" format="color"/>
+        <attr name="frameStroke" format="integer"/>
+    </declare-styleable>
+
+
+    <declare-styleable name="RoundImageView">
+        <attr name="emptyImage"/>
+        <attr name="cornerSize" format="float"/>
+        <attr name="maxSize" format="float"/>
+        <attr name="minSize" format="float"/>
+    </declare-styleable>
+
+</resources>

@@ -1,0 +1,17 @@
+ext {
+	//gradleVersion ='com.android.tools.build:gradle:2.1.2'
+	buildToolsVersion = '23.0.1'
+	compileSdkVersion = 23
+	targetSdkVersion = 22
+	minSdkVersion = 15
+
+	versionCode = 1
+	libVersionName = '1.0.5-beta'
+
+	//bintray setting info
+	repositoryName = 'scglab'
+	packageName = 'com.scglab.common' // module name ex) compile 'tech.thdev:...'
+
+	//dependencies
+	supportLibraryVersion = '23.3.0'
+}

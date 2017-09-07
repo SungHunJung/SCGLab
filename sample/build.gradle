@@ -1,0 +1,31 @@
+apply plugin: 'com.android.application'
+
+android {
+	compileSdkVersion rootProject.ext.compileSdkVersion
+	buildToolsVersion rootProject.ext.buildToolsVersion
+
+	defaultConfig {
+		applicationId rootProject.ext.packageName
+		minSdkVersion rootProject.ext.minSdkVersion
+		targetSdkVersion rootProject.ext.targetSdkVersion
+		versionCode rootProject.ext.versionCode
+		versionName rootProject.ext.libVersionName
+	}
+
+	buildTypes {
+		release {
+			minifyEnabled false
+			proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+		}
+	}
+}
+
+dependencies {
+//	compile "com.android.support:appcompat-v7:$rootProject.ext.supportLibraryVersion"
+
+//	compile project(':list-adapter')
+
+	compile 'com.scglab.common:list-adapter:1.0.5-beta'
+//	compile 'com.scglab.common:widget:1.0.5-beta'
+//	compile 'com.scglab.common:util:1.0.5-beta'
+}
