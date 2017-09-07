@@ -1,0 +1,98 @@
+apply plugin: 'com.android.library'
+apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'com.jfrog.bintray'
+
+group = rootProject.ext.packageName
+version = rootProject.ext.libVersionName
+
+install {
+	repositories.mavenInstaller {
+		pom.project {
+			name project.name
+			description project.name
+			inceptionYear 2017
+
+			// gradle dependency
+			packaging 'aar'
+			groupId rootProject.ext.packageName
+			artifactId project.name
+			version rootProject.ext.libVersionName
+
+			licenses {
+				license {
+					name 'The Apache Software License, Version 2.0'
+					url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+					distribution 'repo'
+				}
+			}
+
+			developers { // Optional setting
+				developer {
+					id 'jsh'
+					name 'SungHunJung'
+					email 'sunghun@scglab.com'
+				}
+			}
+		}
+	}
+}
+
+bintray {
+	Properties properties = new Properties()
+	properties.load(project.rootProject.file('local.properties').newDataInputStream())
+
+	user = properties.getProperty('bintrayUser')
+	key = properties.getProperty('bintrayApiKey')
+
+	configurations = ['archives'] // When uploading configuration files
+
+	publish = true
+
+	pkg {
+		repo = rootProject.ext.repositoryName
+		name = project.name // module name
+		licenses = ['Apache-2.0']
+
+		vcsUrl = 'https://github.com/SungHunJung/SCGLab.git'
+		websiteUrl = 'https://github.com/SungHunJung/SCGLab'
+		issueTrackerUrl = 'https://github.com/SungHunJung/SCGLab/issues'
+
+		version {
+			name = rootProject.ext.libVersionName
+			desc = 'init'
+			released = new Date()
+			vcsTag = rootProject.ext.libVersionName
+		}
+	}
+}
+
+task sourcesJar(type: Jar) {
+	from android.sourceSets.main.java.srcDirs
+	classifier = 'sources'
+}
+
+artifacts {
+	archives sourcesJar
+}
+
+task findConventions << {
+	println project.getConvention()
+}
+
+android {
+	compileSdkVersion rootProject.ext.compileSdkVersion
+	buildToolsVersion rootProject.ext.buildToolsVersion
+
+	defaultConfig {
+		minSdkVersion rootProject.ext.minSdkVersion
+		targetSdkVersion rootProject.ext.targetSdkVersion
+		versionCode rootProject.ext.versionCode
+		versionName rootProject.ext.libVersionName
+	}
+
+	buildTypes {
+		release {
+			minifyEnabled false
+		}
+	}
+}
