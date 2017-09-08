@@ -1,5 +1,15 @@
 # SCGLab
 
+### dependency
+```gradle
+dependencies {
+    // ... other dependencies
+    compile 'com.scglab.common:list-adapter:1.0.8-beta'
+    compile 'com.scglab.common:util:1.0.8-beta'
+    compile 'com.scglab.common:widget:1.0.8-beta'
+}
+```
+
 ### history
 | scglab common version | android support library Version | date |
 | ------ | ------ | ------ |
