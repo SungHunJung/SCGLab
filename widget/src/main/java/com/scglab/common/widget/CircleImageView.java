@@ -7,6 +7,8 @@ import android.graphics.Color;
 import android.graphics.Point;
 import android.util.AttributeSet;
 
+import com.scglab.common.util.BitmapHelper;
+
 public class CircleImageView extends NetworkImageView {
 
 	//--------------------------------------------------------------------------
@@ -74,7 +76,7 @@ public class CircleImageView extends NetworkImageView {
 		emptyImage = Bitmap.createScaledBitmap(emptyImage, point.x, point.y, true);
 //		emptyImage = createCircleBitmap(emptyImage);
 
-		//1 emptyImage = BitmapHelper.circle(emptyImage, circleSize, frameStroke, frameColor);
+		emptyImage = BitmapHelper.circle(emptyImage, circleSize, frameStroke, frameColor);
 	}
 
 	protected Point getResultSize() {
@@ -102,7 +104,7 @@ public class CircleImageView extends NetworkImageView {
 	protected void retouchDrawImage(Point point) {
 		super.retouchDrawImage(point);
 
-		//2 drawImage = BitmapHelper.circle(drawImage, circleSize, frameStroke, frameColor);
+		drawImage = BitmapHelper.circle(drawImage, circleSize, frameStroke, frameColor);
 	}
 
 	/*

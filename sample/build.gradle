@@ -20,11 +20,13 @@ android {
 }
 
 dependencies {
-//	compile "com.android.support:appcompat-v7:$rootProject.ext.supportLibraryVersion"
+	compile "com.android.support:appcompat-v7:$rootProject.ext.supportLibraryVersion"
 
-//	compile project(':list-adapter')
+	compile project(':list-adapter')
+	compile project(':widget')
+	compile project(':util')
 
-	compile 'com.scglab.common:list-adapter:1.0.5-beta'
+//	compile 'com.scglab.common:list-adapter:1.0.5-beta'
 //	compile 'com.scglab.common:widget:1.0.5-beta'
 //	compile 'com.scglab.common:util:1.0.5-beta'
 }

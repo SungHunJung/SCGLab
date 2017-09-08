@@ -1,8 +1,8 @@
 apply from: '../lib.gradle'
 
 dependencies {
-	compile "com.android.support:appcompat-v7:$rootProject.ext.supportLibraryVersion"
-	compile("com.android.support:recyclerview-v7:$rootProject.ext.supportLibraryVersion") {
+	provided "com.android.support:appcompat-v7:$rootProject.ext.supportLibraryVersion"
+	provided("com.android.support:recyclerview-v7:$rootProject.ext.supportLibraryVersion") {
 		exclude group: "com.android.support", module: "support-v4"
 	}
 }

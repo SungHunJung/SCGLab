@@ -9,7 +9,10 @@ import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
+import android.graphics.RectF;
 import android.media.ExifInterface;
+import android.os.Handler;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,6 +21,52 @@ import java.io.IOException;
  * Created by sh on 2016. 5. 23..
  */
 public class BitmapHelper {
+
+	public static void decodeSampledBitmapFromPath(final String path, final int reqWidth, final int reqHeight, final CallBack callBack) {
+		final Handler handler = new Handler();
+
+		new Thread() {
+			@Override
+			public void run() {
+				final BitmapFactory.Options options = new BitmapFactory.Options();
+				options.inJustDecodeBounds = true;
+				BitmapFactory.decodeFile(path, options);
+
+				options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
+				options.inJustDecodeBounds = false;
+				final Bitmap bitmap = normalize(path, BitmapFactory.decodeFile(path, options));
+
+				handler.post(new Runnable() {
+					@Override
+					public void run() {
+						callBack.onResult(bitmap);
+					}
+				});
+			}
+		}.run();
+	}
+
+	public interface CallBack {
+		void onResult(Bitmap bitmap);
+	}
+
+	public static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
+		final int height = options.outHeight;
+		final int width = options.outWidth;
+		int inSampleSize = 1;
+
+		if (height > reqHeight || width > reqWidth) {
+
+			final int halfHeight = height / 2;
+			final int halfWidth = width / 2;
+
+			while ((halfHeight / inSampleSize) >= reqHeight && (halfWidth / inSampleSize) >= reqWidth) {
+				inSampleSize *= 2;
+			}
+		}
+
+		return inSampleSize;
+	}
 
 	public static Bitmap normalize(String path, Bitmap bitmap) {
 		ExifInterface exif = null;
@@ -110,6 +159,65 @@ public class BitmapHelper {
 			temp = ((float) (circleSize) / (2.0f));
 			canvas.drawCircle(x + temp, temp, temp, paint);
 		}
+
+		canvas.restore();
+
+		return image;
+	}
+
+
+	/*protected Bitmap roundBitmap(Bitmap bitmap) {
+		Path clipPath = new Path();
+
+		RectF rect = new RectF(0, 0, bitmap.getWidth(), bitmap.getHeight());
+		clipPath.addRoundRect(rect, cornerSize, cornerSize, Path.Direction.CW);
+
+		Bitmap image = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
+		Canvas canvas = new Canvas(image);
+		canvas.save();
+		canvas.clipPath(clipPath);
+		canvas.drawBitmap(bitmap, 0, 0, null);
+		canvas.restore();
+
+		return image;
+	}*/
+
+	public static Bitmap rect(Bitmap bitmap, float cornerSize, float maxSize) {
+		Rect rect = new Rect(0, 0, (int) maxSize, (int) maxSize);
+		RectF rects = new RectF(rect);
+
+		Bitmap image = Bitmap.createBitmap((int) maxSize, (int) maxSize, Bitmap.Config.ARGB_8888);
+		Canvas canvas = new Canvas(image);
+		canvas.save();
+
+		final Rect topRightRect = new Rect((int) maxSize / 2, 0, (int) maxSize, (int) maxSize / 2);
+
+		//이미지 영역 잡기
+		Paint paint = new Paint();
+		paint.setStyle(Paint.Style.FILL);
+		paint.setAntiAlias(true);
+
+		canvas.drawRoundRect(rects, cornerSize, cornerSize, paint);
+
+		// Fill in upper right corner
+		canvas.drawRect(topRightRect, paint);
+
+
+		//이미지
+		if (null != bitmap) {
+			bitmap = Bitmap.createScaledBitmap(bitmap, (int) maxSize, (int) maxSize, true);
+			paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+			canvas.drawBitmap(bitmap, 0, 0, paint);
+		}
+
+		//프레임
+		/*paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_OVER));
+		if (circleSize > 0) {
+			paint.setColor(frameColor);
+			paint.setStyle(Paint.Style.FILL);
+			temp = ((float) (circleSize) / (2.0f));
+			canvas.drawCircle(x + temp, temp, temp, paint);
+		}*/
 
 		canvas.restore();
 

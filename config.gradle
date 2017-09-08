@@ -6,7 +6,7 @@ ext {
 	minSdkVersion = 15
 
 	versionCode = 1
-	libVersionName = '1.0.5-beta'
+	libVersionName = '1.0.8-beta'
 
 	//bintray setting info
 	repositoryName = 'scglab'

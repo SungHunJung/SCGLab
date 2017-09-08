@@ -9,7 +9,7 @@ install {
 	repositories.mavenInstaller {
 		pom.project {
 			name project.name
-			description project.name
+			description rootProject.ext.repositoryName + project.name
 			inceptionYear 2017
 
 			// gradle dependency

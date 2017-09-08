@@ -46,9 +46,6 @@ public class InputHelper {
 		if (editText.requestFocus()) {
 			InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
 			imm.showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT);
-			imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
 		}
 	}
-
-
 }
