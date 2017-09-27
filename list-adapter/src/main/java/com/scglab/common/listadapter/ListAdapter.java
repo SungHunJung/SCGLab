@@ -1,282 +1,374 @@
 package com.scglab.common.listadapter;
 
-import android.os.Handler;
-import android.os.Message;
 import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Filter;
 import android.widget.Filterable;
 
+import com.scglab.common.listadapter.filter.BaseFilter;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.lang.reflect.Constructor;
-import java.util.ArrayList;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.List;
 
-public class ListAdapter<T extends ListItem> extends RecyclerView.Adapter<ItemViewHolder<T>> implements Filterable {
+/**
+ * Created by shj on 2017. 9. 13..
+ */
+public class ListAdapter extends RecyclerView.Adapter<ItemRenderer> implements Filterable {
 
-	private static final int EVENT_TAP = 1024;
-	private static final int EVENT_LONG_TAP = 1025;
+	@Retention(RetentionPolicy.RUNTIME)
+	@Target(ElementType.TYPE)
+	public @interface Item {
+	}
 
-	private final ViewHolderFactory VIEW_HOLDER_FACTORY;
+	private final RendererFactory RENDERER_FACTORY;
 
-	private IListItemEventHandler<T> itemEventHandler;
-	private ArrayList<T> models;
+	private RecyclerView recyclerView;
 
-	private boolean isEditMode;
+	public ListAdapter(RendererFactory rendererFactory) {
+		RENDERER_FACTORY = rendererFactory;
+		ITEM_STORAGE = new ItemStore();
+	}
 
-	public ListAdapter(ArrayList<T> models, ViewHolderFactory viewHolderFactory) {
-		VIEW_HOLDER_FACTORY = viewHolderFactory;
-		setModels(models);
+	//----------------------------------------
+	// view holder
+	//----------------------------------------
+
+	@Override
+	public ItemRenderer onCreateViewHolder(ViewGroup parent, int viewType) {
+		recyclerView = (RecyclerView) parent;
+		return RENDERER_FACTORY.createItemRenderer(parent, viewType);
 	}
 
 	@Override
-	public ItemViewHolder<T> onCreateViewHolder(ViewGroup parent, int viewType) {
-		ViewHolderFactory.ViewHolderWrapper viewHolderWrapper = VIEW_HOLDER_FACTORY.get(viewType);
-		if (null == viewHolderWrapper) {
-			throw new RuntimeException("Not found ViewHolder and Layout in ViewHolderFactory (viewType : " + viewType + ")");
-		}
+	public void onBindViewHolder(ItemRenderer holder, int position) {
+		holder.listAdapter = this;
+		holder.onClickListener = onClickListener;
+		holder.onLongClickListener = onLongClickListener;
 
-		try {
-			LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
-			Class holderClass = viewHolderWrapper.getViewHolder();
-			Constructor constructor = holderClass.getConstructor(View.class);
+		if (position == 0) holder.setPrevItem(null);
+		else holder.setPrevItem(getItem(position - 1));
 
-			return (ItemViewHolder<T>) constructor.newInstance(layoutInflater.inflate(viewHolderWrapper.getLayout(), parent, false));
-		} catch (Exception ignored) {
-			throw new RuntimeException(ignored.getLocalizedMessage());
+		if (position + 1 < getItemCount()) holder.setNextItem(getItem(position + 1));
+		else holder.setNextItem(null);
+
+		holder.itemView.setOnClickListener(null);
+		holder.itemView.setOnLongClickListener(null);
+
+		holder.setCurrentItem(getItem(position));
+
+		if (holder.itemView.hasOnClickListeners() == false) {
+			holder.itemView.setOnClickListener(onClickListener);
+			holder.itemView.setOnLongClickListener(onLongClickListener);
 		}
+	}
+
+	@Override
+	public void onViewAttachedToWindow(ItemRenderer holder) {
+		super.onViewAttachedToWindow(holder);
+		holder.onAttachedRenderer();
+	}
+
+	@Override
+	public void onViewDetachedFromWindow(ItemRenderer holder) {
+		super.onViewDetachedFromWindow(holder);
+		holder.onDetachedRenderer();
+	}
+
+	@Override
+	public boolean onFailedToRecycleView(ItemRenderer holder) {
+		holder.onIdle();
+		return super.onFailedToRecycleView(holder);
+	}
+
+	@Override
+	public void onViewRecycled(ItemRenderer holder) {
+		super.onViewRecycled(holder);
+		holder.onIdle();
 	}
 
 	@Override
 	public int getItemViewType(int position) {
-		return getItemAtIndex(position).getType();
+		final Object item = getItem(position);
+
+		for (Method method : item.getClass().getMethods()) {
+			if (method.isAnnotationPresent(TypeStore.DefineItem.class)) {
+				try {
+					return (int) method.invoke(item);
+				} catch (Exception ignored) {
+				}
+			}
+		}
+
+		return TypeStore.getInstance().getType(item.getClass());
+	}
+
+	public int getViewPosition(View view) {
+		view = getItemView(view);
+		if (null != view) {
+			RecyclerView.LayoutParams layoutParams = (RecyclerView.LayoutParams) view.getLayoutParams();
+			return layoutParams.getViewAdapterPosition();
+		}
+
+		return -1;
+	}
+
+	private View getItemView(View childView) {
+		while (childView != null) {
+			if (childView.getLayoutParams() instanceof RecyclerView.LayoutParams) {
+				return childView;
+			}
+
+			childView = (View) childView.getParent();
+		}
+
+		return null;
+	}
+
+	//----------------------------------------
+	// model
+	//----------------------------------------
+
+	private final ItemStore ITEM_STORAGE;
+
+	public void setModels(List<Object> list) {
+		ITEM_STORAGE.clear();
+		ITEM_STORAGE.addAll(list);
+		notifyDataSetChanged();
+	}
+
+	public void clear() {
+		ITEM_STORAGE.clear();
+		notifyDataSetChanged();
 	}
 
 	@Override
 	public int getItemCount() {
-		int size = 0;
-		for (ListItem item : models) {
-			if (item.isVisible()) size++;
-		}
-
-		return size;
+		return ITEM_STORAGE.size();
 	}
 
-	@Override
-	public void onBindViewHolder(ItemViewHolder<T> holder, int position) {
-		T item = getItemAtIndex(position);
-
-		switch (getItemViewType(position)) {
-			case ListItem.Type.SEARCH:
-				holder.itemView.setOnClickListener(null);
-				holder.itemView.setOnLongClickListener(null);
-				break;
-
-			default:
-				holder.itemView.setTag(item);
-				holder.itemView.setOnClickListener(onClickListener);
-				holder.itemView.setOnLongClickListener(onLongClickListener);
-
-				holder.onClickListener = onClickListener;
-				holder.onLongClickListener = onLongClickListener;
-				break;
-		}
-
-		holder.position = position;
-		holder.listAdapter = this;
-
-		holder.onBind(item, isEditMode);
-
-		if (position == 0) holder.onPrevItem(null);
-		else holder.onPrevItem(getItemAtIndex(position - 1));
-
-		if (position + 1 < getItemCount()) holder.onNextItem(getItemAtIndex(position + 1));
-		else holder.onNextItem(null);
+	public Object getItem(int position) {
+		return ITEM_STORAGE.get(position);
 	}
 
-	@Override
-	public Filter getFilter() {
-		return new KeywordFilter<>(this, models);
+	public int getItemPosition(Object listItem) {
+		return ITEM_STORAGE.indexOfVisible(listItem);
 	}
 
-	public void setItemEventHandler(IListItemEventHandler<T> handler) {
-		itemEventHandler = handler;
-	}
-
-	public boolean isEditMode() {
-		return isEditMode;
-	}
-
-	public void setEditMode(boolean mode, boolean releaseAll) {
-		if (isEditMode == mode) {
-			return;
-		}
-
-		if (releaseAll) {
-			for (ListItem item : models) {
-				item.setSelected(false);
-			}
-		}
-
-		isEditMode = mode;
-		notifyDataSetChanged();
-	}
-
-	public List<T> getSelectedItemList() {
-		List<T> selectedList = new ArrayList<>();
-
-		for (ListItem item : models) {
-			if (item.isSelected()) selectedList.add((T) item);
-		}
-
-		return selectedList;
-	}
-
-	public void clear() {
-		if (null != models) {
-			models.clear();
+	public void clearAllItem() {
+		if (null != ITEM_STORAGE) {
+			ITEM_STORAGE.clear();
 			notifyDataSetChanged();
 		}
 	}
 
-	public void setModels(ArrayList<T> list) {
-		if (null != list) {
-			models = (ArrayList<T>) list.clone();
-		} else {
-			models = new ArrayList<>();
-		}
-
-		notifyDataSetChanged();
+	public void addItem(int position, Object item) {
+		ITEM_STORAGE.add(position, item);
+		notifyItemInserted(position);
 	}
 
-	public void addModel(int index, final T item) {
-		models.add(index, item);
-		notifyItemInserted(index);
+	public void addItem(Object item) {
+		ITEM_STORAGE.add(item);
+		notifyItemInserted(ITEM_STORAGE.size());
 	}
 
-	public void addModel(final T item) {
-		models.add(item);
-		notifyItemInserted(models.size());
+	public void removeItem(Object item) {
+		int position = getItemPosition(item);
+		removeItem(position);
 	}
 
-	public void removeModel(final T item) {
-		int index = getIndexAtItem(item);
-		removeModel(index);
-	}
-
-	public void removeModel(final int index) {
-		if (index != -1) {
-			models.remove(index);
-			notifyItemRemoved(index);
+	public void removeItem(int position) {
+		if (position != -1) {
+			ITEM_STORAGE.remove(position);
+			notifyItemRemoved(position);
 		}
 	}
 
-	public void removeModels(int start, int end) {
+	public void removeItems(int start, int end) {
 		final int removeCount = end - start + 1;
 		if (removeCount <= 0) return;
 
 		while (start <= end) {
-			models.remove(start);
+			ITEM_STORAGE.remove(start);
 			end--;
 		}
 
 		notifyItemRangeRemoved(start, removeCount);
 	}
 
-	public int replaceModel(final T item) {
-		int index = getIndexAtItem(item);
-		if (index != -1) {
-			models.remove(index);
-			models.add(index, item);
-			notifyItemChanged(index);
+	public void replaceItem(Object oldItem, Object newItem) {
+		int position = getItemPosition(oldItem);
+		replaceItem(position, newItem);
+	}
+
+	public void replaceItem(int position, Object newItem) {
+		if (position != -1) {
+			ITEM_STORAGE.remove(position);
+			ITEM_STORAGE.add(position, newItem);
+			notifyItemChanged(position);
+		}
+	}
+
+	//----------------------------------------
+	// notify
+	//----------------------------------------
+
+	public void notifyItemChanged(Object object) {
+		int position = getItemPosition(object);
+		if (position == -1) return;
+
+		View view;
+		for (int index = 0; index < recyclerView.getChildCount(); index++) {
+			view = recyclerView.getChildAt(index);
+			if (position == getViewPosition(view)) {
+				ItemRenderer itemRenderer = (ItemRenderer) recyclerView.getChildViewHolder(view);
+				onBindViewHolder(itemRenderer, position);
+				return;
+			}
 		}
 
-		return index;
+		notifyItemChanged(position);
 	}
 
-	public int getIndexAtItem(final T item) {
-		return models.indexOf(item);
+	public void notifyItemInserted(Object object) {
+		int position = getItemPosition(object);
+		if (position == -1) return;
+		notifyItemInserted(position);
 	}
 
-	public T getItemAtIndex(int position) {
-		if (getItemCount() <= position) return null;
+	public void notifyItemRemoved(Object object) {
+		int position = getItemPosition(object);
+		if (position == -1) return;
+		notifyItemRemoved(position);
+	}
 
-		int index = 0;
-		while (0 < position || !models.get(index).isVisible()) {
-			if (models.get(index).isVisible()) position--;
-			index++;
+	//----------------------------------------
+	// select
+	//----------------------------------------
+
+	private boolean isSelectMode;
+
+	public boolean isSelectMode() {
+		return isSelectMode;
+	}
+
+	public void setSelectMode(boolean mode) {
+		setSelectMode(mode, false);
+	}
+
+	public void setSelectMode(boolean mode, boolean clearSelected) {
+		int removeSize = 0;
+		if (clearSelected) removeSize = ITEM_STORAGE.clearSelectedList();
+
+		boolean oldMode = isSelectMode;
+		isSelectMode = mode;
+
+		if (removeSize > 0 || isSelectMode != oldMode) notifyDataSetChanged();
+	}
+
+	public void addSelectItem(Object object) {
+		if (ITEM_STORAGE.contains(object))
+			ITEM_STORAGE.addSelectItem(object);
+	}
+
+	public void removeSelectItem(Object object) {
+		if (ITEM_STORAGE.contains(object))
+			ITEM_STORAGE.removeSelectItem(object);
+	}
+
+	public boolean isSelected(Object object) {
+		return ITEM_STORAGE.isSelected(object);
+	}
+
+	public boolean toggleSelectItem(Object object) {
+		boolean result = false;
+
+		if (ITEM_STORAGE.contains(object)) {
+			result = ITEM_STORAGE.toggleSelectItem(object);
+			notifyItemChanged(object);
 		}
 
-		return models.get(index);
+		return result;
 	}
 
-	private View.OnClickListener onClickListener = new View.OnClickListener() {
+	public List<Object> getSelectedItemList() {
+		return ITEM_STORAGE.getSelectedItemList();
+	}
+
+	//----------------------------------------
+	// filter
+	//----------------------------------------
+
+	private Class filterClass = BaseFilter.class;
+
+	public <F extends BaseFilter> void setFilter(Class<F> filterClass) {
+		this.filterClass = filterClass;
+	}
+
+	@Override
+	public Filter getFilter() {
+		if (null == filterClass) {
+			throw new RuntimeException("Set filter class (e.g., adapter.setFilter(class))");
+		}
+
+		try {
+			Constructor constructor = filterClass.getConstructor(getClass(), ItemStore.class);
+			return (Filter) constructor.newInstance(this, ITEM_STORAGE);
+
+		} catch (NoSuchMethodException e) {
+			throw new RuntimeException("constructor cannot be found", e);
+		} catch (InstantiationException e) {
+			throw new RuntimeException("abstract class or interface", e);
+		} catch (IllegalAccessException e) {
+			throw new RuntimeException("constructor method no access", e);
+		} catch (InvocationTargetException e) {
+			throw new RuntimeException("checkout package-name", e);
+		}
+	}
+
+	//----------------------------------------
+	// click event
+	//----------------------------------------
+
+	private OnItemClickEventHandler onItemClickEventHandler;
+
+	public void setOnItemClickEventHandler(OnItemClickEventHandler handler) {
+		onItemClickEventHandler = handler;
+	}
+
+	private final View.OnClickListener onClickListener = new View.OnClickListener() {
 		@Override
-		public void onClick(View v) {
-			if (null == itemEventHandler) return;
+		public void onClick(View view) {
+			if (null == onItemClickEventHandler) return;
 
-			Message message = Message.obtain();
-			message.what = EVENT_TAP;
-			message.arg1 = v.getId();
-			message.obj = v.getTag();
+			final Object item = getItem(getViewPosition(view));
 
-			handler.sendMessage(message);
+			if (isItemView(view)) onItemClickEventHandler.onItemClick(item);
+			else onItemClickEventHandler.onChildViewClick(item, view.getId());
 		}
 	};
 
-	private View.OnLongClickListener onLongClickListener = new View.OnLongClickListener() {
+	private final View.OnLongClickListener onLongClickListener = new View.OnLongClickListener() {
 		@Override
-		public boolean onLongClick(View v) {
+		public boolean onLongClick(View view) {
+			if (null == onItemClickEventHandler) return true;
 
-			if (null == itemEventHandler) return true;
+			final Object item = getItem(getViewPosition(view));
 
-			Message message = Message.obtain();
-			message.what = EVENT_LONG_TAP;
-			message.arg1 = v.getId();
-			message.obj = v.getTag();
-			handler.sendMessage(message);
+			if (isItemView(view)) onItemClickEventHandler.onItemLongClick(item);
+			else onItemClickEventHandler.onChildViewLongClick(item, view.getId());
+
 			return true;
 		}
 	};
 
-	@SuppressWarnings("HandlerLeak")
-	private Handler handler = new Handler() {
-		@Override
-		public void handleMessage(Message msg) {
-			if (null == itemEventHandler) return;
-			final T item = (T) msg.obj;
-			int position = 0;
-			int unVisibleCount = 0;
-
-			while (position < models.size()) {
-				T t = models.get(position);
-
-				if (t.isVisible()) {
-					if (t.equals(item)) break;
-				} else {
-					unVisibleCount++;
-				}
-
-				position++;
-			}
-
-			position -= unVisibleCount;
-
-			switch (msg.what) {
-				case EVENT_TAP:
-					if (itemEventHandler.onClick(item, msg.arg1)) {
-						notifyItemChanged(position);
-					}
-					break;
-
-				case EVENT_LONG_TAP:
-					if (itemEventHandler.onLongClick(item, msg.arg1)) {
-						notifyItemChanged(position);
-					}
-					break;
-			}
-		}
-	};
-
+	private boolean isItemView(View view) {
+		return view.getLayoutParams() instanceof RecyclerView.LayoutParams;
+	}
 }

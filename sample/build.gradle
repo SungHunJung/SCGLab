@@ -6,7 +6,7 @@ android {
 
 	defaultConfig {
 		applicationId rootProject.ext.packageName
-		minSdkVersion rootProject.ext.minSdkVersion
+		minSdkVersion 16
 		targetSdkVersion rootProject.ext.targetSdkVersion
 		versionCode rootProject.ext.versionCode
 		versionName rootProject.ext.libVersionName
@@ -19,14 +19,30 @@ android {
 	}
 }
 
+//for 26.0.1
+//repositories {
+//	maven {
+//		url "https://maven.google.com"
+//	}
+//}
+
 dependencies {
 	compile "com.android.support:appcompat-v7:$rootProject.ext.supportLibraryVersion"
+	compile("com.android.support:recyclerview-v7:$rootProject.ext.supportLibraryVersion") {
+		exclude group: "com.android.support", module: "support-v4"
+	}
+//	compile "com.android.support:appcompat-v7:26.1.0"
+//	compile("com.android.support:recyclerview-v7:26.1.0") {
+//		exclude group: "com.android.support", module: "support-v4"
+//	}
+
+	compile 'com.github.bumptech.glide:glide:3.7.0'
 
 	compile project(':list-adapter')
-	compile project(':widget')
-	compile project(':util')
+//	compile project(':widget')
+//	compile project(':util')
 
-//	compile 'com.scglab.common:list-adapter:1.0.5-beta'
-//	compile 'com.scglab.common:widget:1.0.5-beta'
-//	compile 'com.scglab.common:util:1.0.5-beta'
+//	compile 'com.scglab.common:list-adapter:1.1.0'
+	compile 'com.scglab.common:widget:1.0.8-beta'
+	compile 'com.scglab.common:util:1.0.8-beta'
 }
