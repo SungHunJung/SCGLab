@@ -1,12 +1,12 @@
 package com.scglab.common.adapter;
 
-import com.scglab.common.listadapter.ListAdapter;
+import com.scglab.common.listadapter.FlexAdapter;
 import com.scglab.common.listadapter.filter.Queryable;
 
 /**
  * Created by shj on 2017. 9. 11..
  */
-@ListAdapter.Item
+@FlexAdapter.Item
 public class FilterItem implements Queryable {
 
 	private String message;

@@ -20,7 +20,7 @@ import java.util.List;
 /**
  * Created by shj on 2017. 9. 13..
  */
-public class ListAdapter extends RecyclerView.Adapter<ItemRenderer> implements Filterable {
+public class FlexAdapter extends RecyclerView.Adapter<ItemRenderer> implements Filterable {
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(ElementType.TYPE)
@@ -31,7 +31,7 @@ public class ListAdapter extends RecyclerView.Adapter<ItemRenderer> implements F
 
 	private RecyclerView recyclerView;
 
-	public ListAdapter(RendererFactory rendererFactory) {
+	public FlexAdapter(RendererFactory rendererFactory) {
 		RENDERER_FACTORY = rendererFactory;
 		ITEM_STORAGE = new ItemStore();
 	}
@@ -48,7 +48,7 @@ public class ListAdapter extends RecyclerView.Adapter<ItemRenderer> implements F
 
 	@Override
 	public void onBindViewHolder(ItemRenderer holder, int position) {
-		holder.listAdapter = this;
+		holder.flexAdapter = this;
 		holder.onClickListener = onClickListener;
 		holder.onLongClickListener = onLongClickListener;
 

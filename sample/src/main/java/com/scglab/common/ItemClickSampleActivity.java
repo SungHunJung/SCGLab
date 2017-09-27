@@ -8,7 +8,7 @@ import android.widget.Toast;
 
 import com.scglab.common.adapter.ItemClickRenderer;
 import com.scglab.common.adapter.LabelItem;
-import com.scglab.common.listadapter.ListAdapter;
+import com.scglab.common.listadapter.FlexAdapter;
 import com.scglab.common.listadapter.OnItemClickEventHandler;
 import com.scglab.common.listadapter.RendererFactory;
 
@@ -17,7 +17,7 @@ import com.scglab.common.listadapter.RendererFactory;
  */
 public class ItemClickSampleActivity extends AppCompatActivity {
 
-	private ListAdapter listAdapter;
+	private FlexAdapter flexAdapter;
 
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -28,17 +28,17 @@ public class ItemClickSampleActivity extends AppCompatActivity {
 		rendererFactory.put(ItemClickRenderer.class, R.layout.renderer_item_click);
 
 		//adapter
-		listAdapter = new ListAdapter(rendererFactory);
-		listAdapter.setOnItemClickEventHandler(onItemClickEventHandler);
+		flexAdapter = new FlexAdapter(rendererFactory);
+		flexAdapter.setOnItemClickEventHandler(onItemClickEventHandler);
 
 		//recyclerView
 		RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
 		recyclerView.setLayoutManager(new LinearLayoutManager(this));
-		recyclerView.setAdapter(listAdapter);
+		recyclerView.setAdapter(flexAdapter);
 
 		//add items
 		for (int index = 0; index < 20; index++) {
-			listAdapter.addItem(new LabelItem(String.valueOf(index)));
+			flexAdapter.addItem(new LabelItem(String.valueOf(index)));
 		}
 	}
 
@@ -65,7 +65,7 @@ public class ItemClickSampleActivity extends AppCompatActivity {
 		@Override
 		public void onChildViewClick(Object item, int viewId) {
 			showToast("child click : " + item.toString() + "/" + viewId);
-			if (viewId == R.id.btnRemove) listAdapter.removeItem(item);
+			if (viewId == R.id.btnRemove) flexAdapter.removeItem(item);
 		}
 
 		@Override

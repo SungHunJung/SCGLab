@@ -1,11 +1,11 @@
 package com.scglab.common.adapter;
 
-import com.scglab.common.listadapter.ListAdapter;
+import com.scglab.common.listadapter.FlexAdapter;
 
 /**
  * Created by shj on 2017. 9. 11..
  */
-@ListAdapter.Item
+@FlexAdapter.Item
 public class LabelItem {
 
 	private String message;

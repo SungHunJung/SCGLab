@@ -8,7 +8,7 @@ import android.widget.Toast;
 
 import com.scglab.common.adapter.LabelItem;
 import com.scglab.common.adapter.SelectModeRenderer;
-import com.scglab.common.listadapter.ListAdapter;
+import com.scglab.common.listadapter.FlexAdapter;
 import com.scglab.common.listadapter.OnItemClickEventHandler;
 import com.scglab.common.listadapter.RendererFactory;
 
@@ -19,7 +19,7 @@ import java.util.List;
  */
 public class SelectModeSampleActivity extends AppCompatActivity {
 
-	private ListAdapter listAdapter;
+	private FlexAdapter flexAdapter;
 
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -30,17 +30,17 @@ public class SelectModeSampleActivity extends AppCompatActivity {
 		rendererFactory.put(SelectModeRenderer.class, R.layout.renderer_select_mode);
 
 		//adapter
-		listAdapter = new ListAdapter(rendererFactory);
-		listAdapter.setOnItemClickEventHandler(onItemClickEventHandler);
+		flexAdapter = new FlexAdapter(rendererFactory);
+		flexAdapter.setOnItemClickEventHandler(onItemClickEventHandler);
 
 		//recyclerView
 		RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
 		recyclerView.setLayoutManager(new LinearLayoutManager(this));
-		recyclerView.setAdapter(listAdapter);
+		recyclerView.setAdapter(flexAdapter);
 
 		//add items
 		for (int index = 0; index < 20; index++) {
-			listAdapter.addItem(new LabelItem(String.valueOf(index)));
+			flexAdapter.addItem(new LabelItem(String.valueOf(index)));
 		}
 	}
 
@@ -59,14 +59,14 @@ public class SelectModeSampleActivity extends AppCompatActivity {
 		public void onItemClick(Object item) {
 			showToast("click : " + item.toString());
 
-			if (listAdapter.isSelectMode()) listAdapter.toggleSelectItem(item);
+			if (flexAdapter.isSelectMode()) flexAdapter.toggleSelectItem(item);
 		}
 
 		@Override
 		public void onItemLongClick(Object item) {
-			boolean mode = !listAdapter.isSelectMode();
-			List<Object> selectedItemList = listAdapter.getSelectedItemList();
-			listAdapter.setSelectMode(mode, true);
+			boolean mode = !flexAdapter.isSelectMode();
+			List<Object> selectedItemList = flexAdapter.getSelectedItemList();
+			flexAdapter.setSelectMode(mode, true);
 
 			showToast("SelectMode : " + mode + " / " + selectedItemList.size() + " items selected");
 		}
@@ -75,7 +75,7 @@ public class SelectModeSampleActivity extends AppCompatActivity {
 		public void onChildViewClick(Object item, int viewId) {
 			showToast("child click : " + item.toString() + "/" + viewId);
 
-			if (viewId == R.id.cbSelect && listAdapter.isSelectMode()) listAdapter.toggleSelectItem(item);
+			if (viewId == R.id.cbSelect && flexAdapter.isSelectMode()) flexAdapter.toggleSelectItem(item);
 		}
 
 		@Override

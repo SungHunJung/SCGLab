@@ -7,7 +7,7 @@ import android.support.v7.widget.RecyclerView;
 
 import com.scglab.common.adapter.LabelItem;
 import com.scglab.common.adapter.LabelRenderer;
-import com.scglab.common.listadapter.ListAdapter;
+import com.scglab.common.listadapter.FlexAdapter;
 import com.scglab.common.listadapter.RendererFactory;
 
 /**
@@ -24,16 +24,16 @@ public class BaseSampleActivity extends AppCompatActivity {
 		rendererFactory.put(LabelRenderer.class, R.layout.renderer_label);
 
 		//adapter
-		ListAdapter listAdapter = new ListAdapter(rendererFactory);
+		FlexAdapter flexAdapter = new FlexAdapter(rendererFactory);
 
 		//recyclerView
 		RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
 		recyclerView.setLayoutManager(new LinearLayoutManager(this));
-		recyclerView.setAdapter(listAdapter);
+		recyclerView.setAdapter(flexAdapter);
 
 		//add items
 		for (int index = 0; index < 20; index++) {
-			listAdapter.addItem(new LabelItem(String.valueOf(index)));
+			flexAdapter.addItem(new LabelItem(String.valueOf(index)));
 		}
 	}
 }

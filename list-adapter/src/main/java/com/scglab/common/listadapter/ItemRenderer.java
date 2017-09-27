@@ -24,7 +24,7 @@ public abstract class ItemRenderer<T> extends RecyclerView.ViewHolder {
 		int resId();
 	}
 
-	ListAdapter listAdapter;
+	FlexAdapter flexAdapter;
 
 	public ItemRenderer(View view) {
 		super(view);
@@ -87,23 +87,23 @@ public abstract class ItemRenderer<T> extends RecyclerView.ViewHolder {
 	//----------------------------------------
 
 	protected final boolean isSelectMode() {
-		return listAdapter.isSelectMode();
+		return flexAdapter.isSelectMode();
 	}
 
 	protected final boolean isSelected() {
-		return listAdapter.isSelected(currentItem);
+		return flexAdapter.isSelected(currentItem);
 	}
 
 	protected final void setSelect(boolean value) {
 		if (value) {
-			listAdapter.addSelectItem(currentItem);
+			flexAdapter.addSelectItem(currentItem);
 		} else {
-			listAdapter.removeItem(currentItem);
+			flexAdapter.removeItem(currentItem);
 		}
 	}
 
 	protected final boolean toggleSelect() {
-		return listAdapter.toggleSelectItem(currentItem);
+		return flexAdapter.toggleSelectItem(currentItem);
 	}
 
 	//----------------------------------------
@@ -159,17 +159,17 @@ public abstract class ItemRenderer<T> extends RecyclerView.ViewHolder {
 		itemView.post(new Runnable() {
 			@Override
 			public void run() {
-				listAdapter.notifyItemChanged(currentItem);
+				flexAdapter.notifyItemChanged(currentItem);
 			}
 		});
 	}
 
 	protected final Filter getFilter() {
-		return listAdapter.getFilter();
+		return flexAdapter.getFilter();
 	}
 
 	protected final <F extends BaseFilter> void setFilter(Class<F> filterClass) {
-		listAdapter.setFilter(filterClass);
+		flexAdapter.setFilter(filterClass);
 	}
 
 	//----------------------------------------

@@ -10,7 +10,7 @@ import android.widget.EditText;
 
 import com.scglab.common.adapter.FilterItem;
 import com.scglab.common.adapter.FilterRenderer;
-import com.scglab.common.listadapter.ListAdapter;
+import com.scglab.common.listadapter.FlexAdapter;
 import com.scglab.common.listadapter.RendererFactory;
 
 /**
@@ -18,7 +18,7 @@ import com.scglab.common.listadapter.RendererFactory;
  */
 public class FilterSampleActivity extends AppCompatActivity {
 
-	private ListAdapter listAdapter;
+	private FlexAdapter flexAdapter;
 
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -34,16 +34,16 @@ public class FilterSampleActivity extends AppCompatActivity {
 		rendererFactory.put(FilterRenderer.class, R.layout.renderer_label);
 
 		//adapter
-		listAdapter = new ListAdapter(rendererFactory);
+		flexAdapter = new FlexAdapter(rendererFactory);
 
 		//recyclerView
 		RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
 		recyclerView.setLayoutManager(new LinearLayoutManager(this));
-		recyclerView.setAdapter(listAdapter);
+		recyclerView.setAdapter(flexAdapter);
 
 		//add items
 		for (int index = 0; index < 50; index++) {
-			listAdapter.addItem(new FilterItem(String.valueOf(index)));
+			flexAdapter.addItem(new FilterItem(String.valueOf(index)));
 		}
 	}
 
@@ -60,7 +60,7 @@ public class FilterSampleActivity extends AppCompatActivity {
 
 			@Override
 			public void afterTextChanged(Editable s) {
-				listAdapter.getFilter().filter(s);
+				flexAdapter.getFilter().filter(s);
 			}
 		});
 	}

@@ -90,7 +90,7 @@ public class ItemStore extends ArrayList<Object> {
 	}
 
 	private boolean hasAnnotation(Object object) {
-		return object.getClass().isAnnotationPresent(ListAdapter.Item.class);
+		return object.getClass().isAnnotationPresent(FlexAdapter.Item.class);
 	}
 
 	private int dataPositionToVisiblePosition(int position) {

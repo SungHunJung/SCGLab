@@ -1,4 +1,4 @@
-SCGLab - ListAdapter
+SCGLab - FlexAdapter
 ====================
 * Multiple viewholder [sample](/sample/src/main/java/com/scglab/common/MultipleTypeSampleActivity.java)
 * Child views click [sample](/sample/src/main/java/com/scglab/common/ItemClickSampleActivity.java)
@@ -12,9 +12,9 @@ sample
 how to use
 ---------------------
 ### 1. item (LabelItem.java)
-This is your model class. You only need to add `@ListAdapter.Item` to your model class. So there is no constraint on the supper class.
+This is your model class. You only need to add `@FlexAdapter.Item` to your model class. So there is no constraint on the supper class.
 ```java
-@ListAdapter.Item
+@FlexAdapter.Item
 public class LabelItem {
   //anything...
 }
@@ -51,16 +51,16 @@ RendererFactory rendererFactory = new RendererFactory();
 rendererFactory.put(LabelRenderer.class, R.layout.renderer_label);
 
 //adapter
-ListAdapter listAdapter = new ListAdapter(rendererFactory);
+FlexAdapter flexAdapter = new FlexAdapter(rendererFactory);
 
 //recyclerView
 RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
 recyclerView.setLayoutManager(new LinearLayoutManager(this));
-recyclerView.setAdapter(listAdapter);
+recyclerView.setAdapter(flexAdapter);
 
 //add items
 for (int index = 0; index < 20; index++) {
-  listAdapter.addItem(new LabelItem(String.valueOf(index)));
+  flexAdapter.addItem(new LabelItem(String.valueOf(index)));
 }
 ```
 download
@@ -74,6 +74,7 @@ history
 ---------------------
 | version | compileSdkVersion | minSdkVersion | date |
 | ------ | ------ | ------ | ------ |
+| 1.1.1 | 23 | 15 | 25 Sep 2017 |
 | 1.1.0 | 23 | 15 | 22 Sep 2017 |
 | 1.0.8-beta | 23 | - | 07 Sep 2017 |
 | 1.0.7-beta | 23 | - | 08 Sep 2017 |

@@ -2,7 +2,7 @@ package com.scglab.common.listadapter.filter;
 
 import android.widget.Filter;
 
-import com.scglab.common.listadapter.ListAdapter;
+import com.scglab.common.listadapter.FlexAdapter;
 import com.scglab.common.listadapter.ItemStore;
 
 import java.util.ArrayList;
@@ -13,10 +13,10 @@ import java.util.List;
  */
 public class BaseFilter extends Filter {
 
-	protected ListAdapter adapter;
+	protected FlexAdapter adapter;
 	protected ItemStore itemStore;
 
-	public BaseFilter(ListAdapter adapter, ItemStore itemStore) {
+	public BaseFilter(FlexAdapter adapter, ItemStore itemStore) {
 		this.adapter = adapter;
 		this.itemStore = itemStore;
 	}
