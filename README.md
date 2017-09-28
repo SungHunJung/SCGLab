@@ -1,11 +1,16 @@
-SCGLab - FlexAdapter
+FlexAdapter
 ====================
-* Multiple viewholder [sample](/sample/src/main/java/com/scglab/common/MultipleTypeSampleActivity.java)
-* Child views click [sample](/sample/src/main/java/com/scglab/common/ItemClickSampleActivity.java)
-* Select mode [sample](/sample/src/main/java/com/scglab/common/SelectModeSampleActivity.java)
-* Filter [sample](/sample/src/main/java/com/scglab/common/FilterSampleActivity.java)
+It is a recycler view adapter that supports multiview holders, filters, and child view click events.
 
 sample
+------
+* Basic [link](/sample/src/main/java/com/scglab/common/BaseSampleActivity.java)
+* Multiple viewholder [link](/sample/src/main/java/com/scglab/common/MultipleTypeSampleActivity.java)
+* Child views click [link](/sample/src/main/java/com/scglab/common/ItemClickSampleActivity.java)
+* Select mode [link](/sample/src/main/java/com/scglab/common/SelectModeSampleActivity.java)
+* Filter [link](/sample/src/main/java/com/scglab/common/FilterSampleActivity.java)
+
+screenshot
 ---------------------
 ![](/demo/listadapter_base.gif) ![](/demo/listadapter_multiple.gif) ![](/demo/listadapter_click.gif) ![](/demo/listadapter_select.gif) ![](/demo/listadapter_search.gif) 
 
@@ -66,6 +71,10 @@ for (int index = 0; index < 20; index++) {
 download
 ---------------------
 ```gradle
+repositories {
+    jcenter()
+}
+
 dependencies {
     compile 'com.scglab.common:list-adapter:1.1.1'
 }
@@ -84,6 +93,10 @@ SCGLab - widget
 download
 ---------------------
 ```gradle
+repositories {
+    jcenter()
+}
+
 dependencies {
   compile 'com.scglab.common:util:1.0.8-beta'
 }
@@ -100,6 +113,10 @@ SCGLab - util
 download
 ---------------------
 ```gradle
+repositories {
+    jcenter()
+}
+
 dependencies {
   compile 'com.scglab.common:util:1.0.8-beta'
 }
