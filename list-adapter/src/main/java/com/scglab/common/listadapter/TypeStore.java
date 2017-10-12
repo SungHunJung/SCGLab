@@ -1,11 +1,15 @@
 package com.scglab.common.listadapter;
 
+import android.util.Log;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.security.Key;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -39,6 +43,18 @@ public class TypeStore {
 		TYPE_MAP = new ConcurrentHashMap<>();
 	}
 
+	public boolean isInstance(Class type, Object item) {
+		return type.isInstance(item);
+	}
+
+	public <T> T tryCast(Class<T> t, Object i) {
+		if (isInstance(t, i)) {
+			return (T) i;
+		} else {
+			return null;
+		}
+	}
+
 	public int getType(final Class<? extends ItemRenderer> rendererClass) {
 		TypeStore.DefineRenderer annotation = rendererClass.getAnnotation(TypeStore.DefineRenderer.class);
 		if (null != annotation) {
@@ -66,6 +82,7 @@ public class TypeStore {
 	public int getType(Type value) {
 		String key = value.toString();
 		key = key.replace("class ", "");
+		Log.v("ROOEX", value.toString() + " / " + key);
 		return getType(key);
 	}
 

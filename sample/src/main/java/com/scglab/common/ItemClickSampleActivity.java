@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.scglab.common.adapter.ItemClickRenderer;
@@ -11,6 +12,7 @@ import com.scglab.common.adapter.LabelItem;
 import com.scglab.common.listadapter.FlexAdapter;
 import com.scglab.common.listadapter.OnItemClickEventHandler;
 import com.scglab.common.listadapter.RendererFactory;
+import com.scglab.common.listadapter.TypeStore;
 
 /**
  * Created by shj on 2017. 9. 21..
@@ -65,7 +67,11 @@ public class ItemClickSampleActivity extends AppCompatActivity {
 		@Override
 		public void onChildViewClick(Object item, int viewId) {
 			showToast("child click : " + item.toString() + "/" + viewId);
-			if (viewId == R.id.btnRemove) flexAdapter.removeItem(item);
+
+			LabelItem labelItem = TypeStore.getInstance().tryCast(LabelItem.class, item);
+			if (null != labelItem) {
+				if (viewId == R.id.btnRemove) flexAdapter.removeItem(item);
+			}
 		}
 
 		@Override

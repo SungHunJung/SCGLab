@@ -76,18 +76,20 @@ repositories {
 }
 
 dependencies {
-    compile 'com.scglab.common:list-adapter:1.1.1'
+    compile 'com.scglab.common:list-adapter:1.1.2'
 }
 ```
 history
 ---------------------
 | version | compileSdkVersion | minSdkVersion | date |
 | ------ | ------ | ------ | ------ |
+| 1.1.2 | 23 | 15 | 12 Oct 2017 |
 | 1.1.1 | 23 | 15 | 25 Sep 2017 |
 | 1.1.0 | 23 | 15 | 22 Sep 2017 |
 | 1.0.8-beta | 23 | - | 07 Sep 2017 |
 | 1.0.7-beta | 23 | - | 08 Sep 2017 |
 
+<!--
 SCGLab - widget
 ========
 download
@@ -127,3 +129,4 @@ history
 | ------ | ------ | ------ | ------ |
 | 1.0.8-beta | 23 | - | 07 Sep 2017 |
 | 1.0.7-beta | 23 | - | 08 Sep 2017 |
+-->

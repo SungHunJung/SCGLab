@@ -7,7 +7,7 @@ ext {
 
 	versionCode = 2
 //	libVersionName = '1.0.9-beta'
-	libVersionName = '1.1.1'
+	libVersionName = '1.1.2'
 
 	//bintray setting info
 	repositoryName = 'scglab'
