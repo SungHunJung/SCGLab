@@ -82,7 +82,6 @@ public class TypeStore {
 	public int getType(Type value) {
 		String key = value.toString();
 		key = key.replace("class ", "");
-		Log.v("ROOEX", value.toString() + " / " + key);
 		return getType(key);
 	}
 

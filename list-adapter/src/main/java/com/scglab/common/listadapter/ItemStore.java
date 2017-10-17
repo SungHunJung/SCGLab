@@ -23,7 +23,7 @@ public class ItemStore extends ArrayList<Object> {
 
 	@Override
 	public int size() {
-		return super.size() - HIDE_LIST.size();
+		return realSize() - HIDE_LIST.size();
 	}
 
 	@Override
@@ -113,7 +113,7 @@ public class ItemStore extends ArrayList<Object> {
 
 		int result = -1;
 		int index = 0;
-		while (result != position) {
+		while (result != position && realSize() > index) {
 			if (HIDE_LIST.contains(super.get(index)) == false) {
 				result++;
 			}
