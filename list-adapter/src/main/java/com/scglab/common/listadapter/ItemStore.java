@@ -69,6 +69,11 @@ public class ItemStore extends ArrayList<Object> {
 		throw new RuntimeException("Try indexOfData or indexOfVisible");
 	}
 
+	@Override
+	public boolean contains(Object object) {
+		return indexOfData(object) != -1;
+	}
+
 	public int indexOfData(Object object) {
 		return super.indexOf(object);
 	}
