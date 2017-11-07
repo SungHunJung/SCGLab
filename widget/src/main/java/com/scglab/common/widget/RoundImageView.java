@@ -7,7 +7,9 @@ import android.graphics.Canvas;
 import android.graphics.Path;
 import android.graphics.Point;
 import android.graphics.RectF;
+import android.support.annotation.Nullable;
 import android.util.AttributeSet;
+import android.util.Log;
 
 public class RoundImageView extends NetworkImageView {
 
@@ -17,9 +19,7 @@ public class RoundImageView extends NetworkImageView {
 	//
 	//--------------------------------------------------------------------------
 
-	private float cornerSize;
-	private float maxSize;
-	private float minSize;
+	private float[] cornerSize;
 
 	//--------------------------------------------------------------------------
 	//
@@ -33,21 +33,29 @@ public class RoundImageView extends NetworkImageView {
 
 	public RoundImageView(Context context) {
 		super(context);
+		initEmptyImage();
 	}
 
 	public RoundImageView(Context context, AttributeSet attrs) {
 		super(context, attrs);
+		initEmptyImage();
 	}
 
 	public RoundImageView(Context context, AttributeSet attrs, int defStyleAttr) {
 		super(context, attrs, defStyleAttr);
+		initEmptyImage();
+	}
+
+	public RoundImageView(Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+		super(context, attrs, defStyleAttr, defStyleRes);
+		initEmptyImage();
 	}
 
 	//--------------------------------------------------------------------------
 	//	Internal
 	//--------------------------------------------------------------------------
 
-	protected float getCornerSize() {
+	protected float[] getCornerSize() {
 		return cornerSize;
 	}
 
@@ -55,67 +63,47 @@ public class RoundImageView extends NetworkImageView {
 		return R.styleable.RoundImageView;
 	}
 
-	protected Point getResultSize() {
-		if (null == drawImage && emptyImage != null) {
-			return new Point(emptyImage.getWidth(), emptyImage.getHeight());
-		}
-
-		Point point = super.getResultSize();
-
-		float rate = 1;
-		if (point.x > maxSize || point.y > maxSize) {
-			if (point.x > point.y) rate = (float) point.x / maxSize;
-			else rate = (float) point.y / maxSize;
-		}
-
-		if (minSize != -1) {
-			if (point.x < minSize || point.y < minSize) {
-				if (point.x > point.y) rate = (float) point.x / maxSize;
-				else rate = (float) point.y / maxSize;
-			}
-		}
-
-		return new Point((int) ((float) point.x / rate), (int) ((float) point.y / rate));
-	}
-
 	protected void initStyle(TypedArray typedArray) {
 		super.initStyle(typedArray);
 
 		float density = getResources().getDisplayMetrics().density;
 
-		cornerSize = typedArray.getFloat(R.styleable.RoundImageView_cornerSize, 10);
-		cornerSize = (int) (density * cornerSize);
-
-		maxSize = typedArray.getFloat(R.styleable.RoundImageView_maxSize, 200);
-		maxSize = (int) (density * maxSize);
-
-		minSize = typedArray.getFloat(R.styleable.RoundImageView_minSize, -1);
-		minSize = (int) (density * minSize);
-
-		Point point = getResultSize();
-		emptyImage = Bitmap.createScaledBitmap(emptyImage, point.x, point.y, true);
-		emptyImage = roundBitmap(emptyImage);
+		cornerSize = new float[8];
+		float base = typedArray.getFloat(R.styleable.RoundImageView_cornerSize, 0);
+		cornerSize[0] = cornerSize[1] = typedArray.getFloat(R.styleable.RoundImageView_cornerSizeTopLeft, base) * density;
+		cornerSize[2] = cornerSize[3] = typedArray.getFloat(R.styleable.RoundImageView_cornerSizeTopRight, base) * density;
+		cornerSize[4] = cornerSize[5] = typedArray.getFloat(R.styleable.RoundImageView_cornerSizeBottomRight, base) * density;
+		cornerSize[6] = cornerSize[7] = typedArray.getFloat(R.styleable.RoundImageView_cornerSizeBottomLeft, base) * density;
 	}
 
 	protected void retouchDrawImage(Point point) {
 		super.retouchDrawImage(point);
 
-		drawImage = roundBitmap(drawImage);
+		drawImage = retouch.run(drawImage);
 	}
 
-	protected Bitmap roundBitmap(Bitmap bitmap) {
-		Path clipPath = new Path();
-
-		RectF rect = new RectF(0, 0, bitmap.getWidth(), bitmap.getHeight());
-		clipPath.addRoundRect(rect, cornerSize, cornerSize, Path.Direction.CW);
-
-		Bitmap image = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
-		Canvas canvas = new Canvas(image);
-		canvas.save();
-		canvas.clipPath(clipPath);
-		canvas.drawBitmap(bitmap, 0, 0, null);
-		canvas.restore();
-
-		return image;
+	private void initEmptyImage() {
+		if (getEmptyImage().hasImage()) {
+			getEmptyImage().retouch(retouch);
+		}
 	}
+
+	private Retouch retouch = new Retouch() {
+		@Override
+		public Bitmap run(Bitmap bitmap) {
+			Path clipPath = new Path();
+
+			RectF rect = new RectF(0, 0, bitmap.getWidth(), bitmap.getHeight());
+			clipPath.addRoundRect(rect, cornerSize, Path.Direction.CW);
+
+			Bitmap image = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
+			Canvas canvas = new Canvas(image);
+			canvas.save();
+			canvas.clipPath(clipPath);
+			canvas.drawBitmap(bitmap, 0, 0, null);
+			canvas.restore();
+
+			return image;
+		}
+	};
 }

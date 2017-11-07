@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:orientation="vertical">
+
+	<com.scglab.common.widget.RoundImageView
+		android:id="@+id/imgTest"
+		android:layout_width="200dp"
+		android:layout_height="300dp"
+		android:background="@android:color/black"
+		app:cornerSizeBottomLeft="20"
+		app:cornerSizeBottomRight="20"
+		app:cornerSizeTopLeft="20"
+		app:cornerSizeTopRight="0"
+
+		app:emptyImage="@drawable/common_ic_search_blue"
+		app:showRealImageSize="true"/>
+
+
+	<Space
+		android:layout_width="100dp"
+		android:layout_height="20dp"/>
+
+	<com.scglab.common.widget.CircleImageView
+		android:id="@+id/imgTest2"
+		android:layout_width="200dp"
+		android:layout_height="300dp"
+		android:background="@android:color/black"
+
+		app:circleSize="100"
+		app:emptyImage="@drawable/main_list_img_1"/>
+
+</LinearLayout>

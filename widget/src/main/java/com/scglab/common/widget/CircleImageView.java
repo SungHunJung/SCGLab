@@ -5,6 +5,7 @@ import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Point;
+import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 
 import com.scglab.common.util.BitmapHelper;
@@ -33,14 +34,22 @@ public class CircleImageView extends NetworkImageView {
 
 	public CircleImageView(Context context) {
 		super(context);
+		initEmptyImage();
 	}
 
 	public CircleImageView(Context context, AttributeSet attrs) {
 		super(context, attrs);
+		initEmptyImage();
 	}
 
 	public CircleImageView(Context context, AttributeSet attrs, int defStyleAttr) {
 		super(context, attrs, defStyleAttr);
+		initEmptyImage();
+	}
+
+	public CircleImageView(Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+		super(context, attrs, defStyleAttr, defStyleRes);
+		initEmptyImage();
 	}
 
 	//--------------------------------------------------------------------------
@@ -71,25 +80,20 @@ public class CircleImageView extends NetworkImageView {
 
 		circleSize = typedArray.getInt(R.styleable.CircleImageView_circleSize, 100);
 		circleSize = (int) (density * (float) circleSize);
-
-		Point point = getResultSize();
-		emptyImage = Bitmap.createScaledBitmap(emptyImage, point.x, point.y, true);
-//		emptyImage = createCircleBitmap(emptyImage);
-
-		emptyImage = BitmapHelper.circle(emptyImage, circleSize, frameStroke, frameColor);
 	}
 
 	protected Point getResultSize() {
-		float tempWidth,tempHeight;
+		float tempWidth, tempHeight;
 
 		if (null != drawImage) {
-			  tempWidth = drawImage.getWidth();
-			  tempHeight = drawImage.getHeight();
+			tempWidth = drawImage.getWidth();
+			tempHeight = drawImage.getHeight();
+		} else if (getEmptyImage().hasImage()) {
+			tempWidth = getEmptyImage().getBitmap().getWidth();
+			tempHeight = getEmptyImage().getBitmap().getHeight();
 		} else {
-			  tempWidth = emptyImage.getWidth();
-			  tempHeight = emptyImage.getHeight();
+			return new Point(circleSize, circleSize);
 		}
-
 
 		float rate;
 		if (tempWidth > tempHeight) rate = tempHeight / circleSize;
@@ -104,42 +108,19 @@ public class CircleImageView extends NetworkImageView {
 	protected void retouchDrawImage(Point point) {
 		super.retouchDrawImage(point);
 
-		drawImage = BitmapHelper.circle(drawImage, circleSize, frameStroke, frameColor);
+		drawImage = retouch.run(drawImage);
 	}
 
-	/*
-	private Bitmap createCircleBitmap(Bitmap bitmap) {
-		Bitmap image = Bitmap.createBitmap(circleSize, circleSize, Bitmap.Config.ARGB_8888);
-		Canvas canvas = new Canvas(image);
-		canvas.save();
-
-		float temp;
-		final float x = (int) ((canvas.getWidth() - circleSize) / 2.0f);
-
-		//이미지 영역 잡기
-		paint.setColor(frameColor);
-		paint.setStyle(Paint.Style.FILL);
-		temp = ((float) (circleSize) / 2.0f - frameStroke);
-		canvas.drawCircle(x + temp + frameStroke, temp + frameStroke, temp, paint);
-
-		//이미지
-		if (null != bitmap) {
-			paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-			canvas.drawBitmap(bitmap, x + (float) (circleSize - image.getWidth()) / 2.0f, (float) (circleSize - image.getHeight()) / 2.0f, paint);
+	private void initEmptyImage() {
+		if (getEmptyImage().hasImage()) {
+			getEmptyImage().retouch(retouch);
 		}
-
-		//프레임
-		paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_OVER));
-		if (circleSize > 0) {
-			paint.setColor(frameColor);
-			paint.setStyle(Paint.Style.FILL);
-			temp = ((float) (circleSize) / (2.0f));
-			canvas.drawCircle(x + temp, temp, temp, paint);
-		}
-
-		canvas.restore();
-
-		return image;
 	}
-	*/
+
+	private Retouch retouch = new Retouch() {
+		@Override
+		public Bitmap run(Bitmap bitmap) {
+			return BitmapHelper.circle(bitmap, circleSize, frameStroke, frameColor);
+		}
+	};
 }

@@ -165,65 +165,6 @@ public class BitmapHelper {
 		return image;
 	}
 
-
-	/*protected Bitmap roundBitmap(Bitmap bitmap) {
-		Path clipPath = new Path();
-
-		RectF rect = new RectF(0, 0, bitmap.getWidth(), bitmap.getHeight());
-		clipPath.addRoundRect(rect, cornerSize, cornerSize, Path.Direction.CW);
-
-		Bitmap image = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
-		Canvas canvas = new Canvas(image);
-		canvas.save();
-		canvas.clipPath(clipPath);
-		canvas.drawBitmap(bitmap, 0, 0, null);
-		canvas.restore();
-
-		return image;
-	}*/
-
-	public static Bitmap rect(Bitmap bitmap, float cornerSize, float maxSize) {
-		Rect rect = new Rect(0, 0, (int) maxSize, (int) maxSize);
-		RectF rects = new RectF(rect);
-
-		Bitmap image = Bitmap.createBitmap((int) maxSize, (int) maxSize, Bitmap.Config.ARGB_8888);
-		Canvas canvas = new Canvas(image);
-		canvas.save();
-
-		final Rect topRightRect = new Rect((int) maxSize / 2, 0, (int) maxSize, (int) maxSize / 2);
-
-		//이미지 영역 잡기
-		Paint paint = new Paint();
-		paint.setStyle(Paint.Style.FILL);
-		paint.setAntiAlias(true);
-
-		canvas.drawRoundRect(rects, cornerSize, cornerSize, paint);
-
-		// Fill in upper right corner
-		canvas.drawRect(topRightRect, paint);
-
-
-		//이미지
-		if (null != bitmap) {
-			bitmap = Bitmap.createScaledBitmap(bitmap, (int) maxSize, (int) maxSize, true);
-			paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-			canvas.drawBitmap(bitmap, 0, 0, paint);
-		}
-
-		//프레임
-		/*paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_OVER));
-		if (circleSize > 0) {
-			paint.setColor(frameColor);
-			paint.setStyle(Paint.Style.FILL);
-			temp = ((float) (circleSize) / (2.0f));
-			canvas.drawCircle(x + temp, temp, temp, paint);
-		}*/
-
-		canvas.restore();
-
-		return image;
-	}
-
 	public static Bitmap blur(Bitmap sentBitmap, int radius) {
 		// Stack Blur v1.0 from
 		// http://www.quasimondo.com/StackBlurForCanvas/StackBlurDemo.html

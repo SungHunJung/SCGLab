@@ -7,14 +7,14 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Point;
+import android.support.annotation.Nullable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
-
-import java.security.ProviderException;
 
 public class NetworkImageView extends View {
 
@@ -29,9 +29,10 @@ public class NetworkImageView extends View {
 	private String imageUrl;
 	private String currentLoadedUrl;
 	private boolean needResize;
+	private boolean showRealImageSize;
 
 	protected Bitmap drawImage;
-	protected Bitmap emptyImage;
+	private EmptyImage emptyImage;
 
 	//--------------------------------------------------------------------------
 	//
@@ -55,7 +56,12 @@ public class NetworkImageView extends View {
 
 	public NetworkImageView(Context context, AttributeSet attrs, int defStyleAttr) {
 		super(context, attrs, defStyleAttr);
-		init(context.getTheme().obtainStyledAttributes(attrs, getStyleable(), 0, 0));
+		init(context.getTheme().obtainStyledAttributes(attrs, getStyleable(), defStyleAttr, 0));
+	}
+
+	public NetworkImageView(Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+		super(context, attrs, defStyleAttr, defStyleRes);
+		init(context.getTheme().obtainStyledAttributes(attrs, getStyleable(), defStyleAttr, defStyleRes));
 	}
 
 	//--------------------------------------------------------------------------
@@ -76,12 +82,12 @@ public class NetworkImageView extends View {
 
 		if (needResize) {
 			needResize = !resizeImage();
-//			requestLayout();
-//			return;
 		}
 
-		if (null != drawImage) canvas.drawBitmap(drawImage, 0, 0, null);
-		else if (null != emptyImage) canvas.drawBitmap(emptyImage, 0, 0, null);
+		if (null != drawImage)
+			canvas.drawBitmap(drawImage, 0, 0, null);
+		else if (null != getEmptyImage())
+			canvas.drawBitmap(getEmptyImage().getBitmap(), (canvas.getWidth() - getEmptyImage().getBitmap().getWidth()) / 2, (canvas.getHeight() - getEmptyImage().getBitmap().getHeight()) / 2, null);
 	}
 
 	//--------------------------------------------------------------------------
@@ -145,26 +151,20 @@ public class NetworkImageView extends View {
 	}
 
 	protected void initStyle(TypedArray typedArray) {
-		int emptyImageResource = typedArray.getResourceId(R.styleable.NetworkImageView_emptyImage, -1);
-		if (emptyImageResource != -1)
-			emptyImage = BitmapFactory.decodeResource(getResources(), emptyImageResource);
-		else
-			throw new ProviderException("Not found empty image : Must have image of empty situation.");
+	}
+
+	protected EmptyImage getEmptyImage() {
+		return emptyImage;
 	}
 
 	protected Point getResultSize() {
-		if (null != drawImage)
-			return new Point(drawImage.getWidth(), drawImage.getHeight());
-
-		int tempWidth = getWidth();
-		int tempHeight = getHeight();
-
-		if (getWidth() == 0 || getHeight() == 0) {
-			tempWidth = emptyImage.getWidth();
-			tempHeight = emptyImage.getHeight();
+		if (showRealImageSize == false) return new Point(getMeasuredWidth(), getMeasuredHeight());
+		if (null != drawImage) return new Point(drawImage.getWidth(), drawImage.getHeight());
+		if (getEmptyImage().hasImage()) {
+			return new Point(getEmptyImage().getBitmap().getWidth(), getEmptyImage().getBitmap().getHeight());
 		}
 
-		return new Point(tempWidth, tempHeight);
+		return new Point(getMeasuredWidth(), getMeasuredHeight());
 	}
 
 	protected void retouchDrawImage(Point point) {
@@ -177,6 +177,8 @@ public class NetworkImageView extends View {
 		paint = new Paint();
 		paint.setAntiAlias(true);
 
+		showRealImageSize = typedArray.getBoolean(R.styleable.NetworkImageView_showRealImageSize, false);
+		emptyImage = new EmptyImage(typedArray.getResourceId(R.styleable.NetworkImageView_emptyImage, -1));
 		initStyle(typedArray);
 
 		try {
@@ -205,4 +207,43 @@ public class NetworkImageView extends View {
 			if (null != resource) setImage(resource);
 		}
 	};
+
+	//--------------------------------------------------------------------------
+	//	Inner Class
+	//--------------------------------------------------------------------------
+
+	public class EmptyImage {
+		private Bitmap bitmap;
+		private int res;
+
+		public EmptyImage(int res) {
+			this.res = res;
+		}
+
+		public Bitmap getBitmap() {
+			if (hasImage() == false)
+				return null;
+
+			if (null == bitmap)
+				bitmap = BitmapFactory.decodeResource(getResources(), res);
+
+			return bitmap;
+		}
+
+		public boolean hasImage() {
+			return res != -1;
+		}
+
+		public void retouch(Retouch retouch) {
+			if (null != retouch) {
+				bitmap = retouch.run(getBitmap());
+			} else {
+				Log.e("ROOEX", "retouch is null");
+			}
+		}
+	}
+
+	public interface Retouch {
+		Bitmap run(Bitmap bitmap);
+	}
 }
