@@ -2,7 +2,9 @@ package com.scglab.common.listadapter;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Hashtable;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by shj on 2017. 9. 20..
@@ -17,6 +19,7 @@ public class ItemStore extends ArrayList<Object> {
 	@Override
 	public void clear() {
 		super.clear();
+		POSITION_MAP.clear();
 		HIDE_LIST.clear();
 		SELECT_LIST.clear();
 	}
@@ -98,9 +101,21 @@ public class ItemStore extends ArrayList<Object> {
 		return object.getClass().isAnnotationPresent(FlexAdapter.Item.class);
 	}
 
+	//----------------------------------------
+	// position
+	//----------------------------------------
+
+	private Hashtable<Integer, Integer> POSITION_MAP = new Hashtable<>(); //<VisiblePosition, DataPosition>
+
 	private int dataPositionToVisiblePosition(int position) {
 		if (HIDE_LIST.isEmpty()) return position;
 		if (position < 0) return position;
+
+		for (Integer key : POSITION_MAP.keySet()) {
+			if (POSITION_MAP.get(key) == position) {
+				return key;
+			}
+		}
 
 		int result = 0;
 		for (int index = 0; index < position; index++) {
@@ -109,12 +124,18 @@ public class ItemStore extends ArrayList<Object> {
 			}
 		}
 
+		POSITION_MAP.put(result, position);
+
 		return result;
 	}
 
 	private int visiblePositionToDataPosition(int position) {
 		if (HIDE_LIST.isEmpty()) return position;
 		if (position < 0) return position;
+
+		if (POSITION_MAP.containsKey(position)) {
+			return POSITION_MAP.get(position);
+		}
 
 		int result = -1;
 		int index = 0;
@@ -125,8 +146,12 @@ public class ItemStore extends ArrayList<Object> {
 			index++;
 		}
 
-		if (index > 0) --index;
-		return index;
+		result = index > 0 ? --index : index;
+		POSITION_MAP.put(position, result);
+
+		return result;
+//		if (index > 0) --index;
+//		return index;
 	}
 
 	//----------------------------------------
@@ -155,11 +180,15 @@ public class ItemStore extends ArrayList<Object> {
 		if (hasAnnotation(object)) {
 			removeHideItem(object);
 			HIDE_LIST.add(object);
+			POSITION_MAP.clear();
 		}
 	}
 
 	public void removeHideItem(Object object) {
-		HIDE_LIST.remove(object);
+		if (isHided(object)) {
+			HIDE_LIST.remove(object);
+			POSITION_MAP.clear();
+		}
 	}
 
 	public void clearHidedItem() {
