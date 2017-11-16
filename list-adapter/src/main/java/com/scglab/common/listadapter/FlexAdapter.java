@@ -223,13 +223,15 @@ public class FlexAdapter extends RecyclerView.Adapter<ItemRenderer> implements F
 		int position = getItemPosition(object);
 		if (position == -1) return;
 
-		View view;
-		for (int index = 0; index < recyclerView.getChildCount(); index++) {
-			view = recyclerView.getChildAt(index);
-			if (position == getViewPosition(view)) {
-				ItemRenderer itemRenderer = (ItemRenderer) recyclerView.getChildViewHolder(view);
-				onBindViewHolder(itemRenderer, position);
-				return;
+		if (null != recyclerView) {
+			View view;
+			for (int index = 0; index < recyclerView.getChildCount(); index++) {
+				view = recyclerView.getChildAt(index);
+				if (position == getViewPosition(view)) {
+					ItemRenderer itemRenderer = (ItemRenderer) recyclerView.getChildViewHolder(view);
+					onBindViewHolder(itemRenderer, position);
+					return;
+				}
 			}
 		}
 
