@@ -26,6 +26,9 @@ public class NetworkImageView extends View {
 
 	protected Paint paint;
 
+	private int widthMeasureSpec;
+	private int heightMeasureSpec;
+
 	private String imageUrl;
 	private String currentLoadedUrl;
 	private boolean needResize;
@@ -70,9 +73,13 @@ public class NetworkImageView extends View {
 
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+		this.widthMeasureSpec = widthMeasureSpec;
+		this.heightMeasureSpec = heightMeasureSpec;
 		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 
 		Point point = getResultSize();
+		Log.v("ROOEX", getMeasuredWidth() + " / " + getMeasuredHeight() + " / " + getWidth() + " / " + getHeight());
+		Log.v("ROOEX", point.toString());
 		setMeasuredDimension(point.x, point.y);
 	}
 
@@ -84,10 +91,13 @@ public class NetworkImageView extends View {
 			needResize = !resizeImage();
 		}
 
-		if (null != drawImage)
+		if (null != drawImage) {
+			Log.i("ROOEX", drawImage.getWidth() + " / " + drawImage.getHeight());
+			Log.i("ROOEX", canvas.getWidth() + " / " + canvas.getHeight());
 			canvas.drawBitmap(drawImage, 0, 0, null);
-		else if (null != getEmptyImage())
+		} else if (null != getEmptyImage()) {
 			canvas.drawBitmap(getEmptyImage().getBitmap(), (canvas.getWidth() - getEmptyImage().getBitmap().getWidth()) / 2, (canvas.getHeight() - getEmptyImage().getBitmap().getHeight()) / 2, null);
+		}
 	}
 
 	//--------------------------------------------------------------------------
@@ -104,11 +114,11 @@ public class NetworkImageView extends View {
 			return;
 		}
 
+		Log.w("ROOEX", "bitmap : " + bitmap.getWidth() + " / " + bitmap.getHeight());
 		currentLoadedUrl = imageUrl;
 		drawImage = bitmap;
 		needResize = true;
 		requestLayout();
-		invalidate();
 	}
 
 	public void clear() {
@@ -116,7 +126,6 @@ public class NetworkImageView extends View {
 		imageUrl = null;
 		drawImage = null;
 		requestLayout();
-		invalidate();
 	}
 
 	public void setImageUrl(final String requestUrl) {
@@ -158,13 +167,31 @@ public class NetworkImageView extends View {
 	}
 
 	protected Point getResultSize() {
-		if (showRealImageSize == false) return new Point(getMeasuredWidth(), getMeasuredHeight());
-		if (null != drawImage) return new Point(drawImage.getWidth(), drawImage.getHeight());
-		if (getEmptyImage().hasImage()) {
+		//width, height가 둘다 wrap_content라면 showRealImageSize는 true
+		if (false == showRealImageSize)
+			showRealImageSize = MeasureSpec.getMode(widthMeasureSpec) == MeasureSpec.AT_MOST && MeasureSpec.getMode(heightMeasureSpec) == MeasureSpec.AT_MOST;
+
+		//showRealImageSize는 이미지가 있을때 의미 있음
+		if (showRealImageSize && null != drawImage) {
+			return new Point(drawImage.getWidth(), drawImage.getHeight());
+		}
+
+		//이미지는 없음 + 임시 이미지가 있음
+		if (null == drawImage && getEmptyImage().hasImage()) {
 			return new Point(getEmptyImage().getBitmap().getWidth(), getEmptyImage().getBitmap().getHeight());
 		}
 
-		return new Point(getMeasuredWidth(), getMeasuredHeight());
+		//이미지 있음 + wrap_content대응
+		if (null != drawImage) {
+			int width = MeasureSpec.getSize(widthMeasureSpec);
+			int height = MeasureSpec.getSize(heightMeasureSpec);
+			final float rate = (float) drawImage.getWidth() / (float) drawImage.getHeight();
+			if (MeasureSpec.getMode(widthMeasureSpec) == MeasureSpec.AT_MOST) width = (int) (height * rate);
+			if (MeasureSpec.getMode(heightMeasureSpec) == MeasureSpec.AT_MOST) height = (int) (width / rate);
+			return new Point(width, height);
+		}
+
+		return new Point(MeasureSpec.getSize(widthMeasureSpec), MeasureSpec.getSize(heightMeasureSpec));
 	}
 
 	protected void retouchDrawImage(Point point) {
