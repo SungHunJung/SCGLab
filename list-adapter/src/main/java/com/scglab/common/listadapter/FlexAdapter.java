@@ -334,6 +334,10 @@ public class FlexAdapter extends RecyclerView.Adapter<ItemRenderer> implements F
 		}
 	}
 
+	public List<Object> getHideItemList() {
+		return ITEM_STORAGE.getHidedItemList();
+	}
+
 	//----------------------------------------
 	// click event
 	//----------------------------------------
