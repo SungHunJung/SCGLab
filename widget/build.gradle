@@ -1,7 +1,0 @@
-apply from: '../lib.gradle'
-
-dependencies {
-	provided "com.android.support:appcompat-v7:$rootProject.ext.supportLibraryVersion"
-	provided 'com.github.bumptech.glide:glide:3.7.0'
-	provided project(':util')
-}
