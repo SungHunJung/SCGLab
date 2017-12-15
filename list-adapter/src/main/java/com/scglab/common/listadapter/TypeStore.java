@@ -1,15 +1,11 @@
 package com.scglab.common.listadapter;
 
-import android.util.Log;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.security.Key;
-import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 

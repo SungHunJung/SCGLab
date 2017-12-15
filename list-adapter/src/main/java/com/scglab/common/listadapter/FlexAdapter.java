@@ -355,8 +355,8 @@ public class FlexAdapter extends RecyclerView.Adapter<ItemRenderer> implements F
 
 			final Object item = getItem(getViewPosition(view));
 
-			if (isItemView(view)) onItemClickEventHandler.onItemClick(item);
-			else onItemClickEventHandler.onChildViewClick(item, view.getId());
+			if (isItemView(view)) onItemClickEventHandler.onItemClick(item, view);
+			else onItemClickEventHandler.onChildViewClick(item, getItemView(view), view.getId());
 		}
 	};
 
@@ -367,8 +367,8 @@ public class FlexAdapter extends RecyclerView.Adapter<ItemRenderer> implements F
 
 			final Object item = getItem(getViewPosition(view));
 
-			if (isItemView(view)) onItemClickEventHandler.onItemLongClick(item);
-			else onItemClickEventHandler.onChildViewLongClick(item, view.getId());
+			if (isItemView(view)) onItemClickEventHandler.onItemLongClick(item, view);
+			else onItemClickEventHandler.onChildViewLongClick(item, getItemView(view), view.getId());
 
 			return true;
 		}
