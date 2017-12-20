@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import com.scglab.common.adapter.ItemClickRenderer;
@@ -55,17 +56,17 @@ public class ItemClickSampleActivity extends AppCompatActivity {
 
 	private final OnItemClickEventHandler onItemClickEventHandler = new OnItemClickEventHandler() {
 		@Override
-		public void onItemClick(Object item) {
+		public void onItemClick(Object item, View rendererView) {
 			showToast("click : " + item.toString());
 		}
 
 		@Override
-		public void onItemLongClick(Object item) {
+		public void onItemLongClick(Object item, View rendererView) {
 			showToast("long click : " + item.toString());
 		}
 
 		@Override
-		public void onChildViewClick(Object item, int viewId) {
+		public void onChildViewClick(Object item, View rendererView, int viewId) {
 			showToast("child click : " + item.toString() + "/" + viewId);
 
 			LabelItem labelItem = TypeStore.getInstance().tryCast(LabelItem.class, item);
@@ -75,7 +76,7 @@ public class ItemClickSampleActivity extends AppCompatActivity {
 		}
 
 		@Override
-		public void onChildViewLongClick(Object item, int viewId) {
+		public void onChildViewLongClick(Object item, View rendererView, int viewId) {
 			showToast("child long click : " + item.toString() + "/" + viewId);
 		}
 	};

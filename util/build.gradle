@@ -1,5 +1,0 @@
-apply from: '../lib.gradle'
-
-dependencies {
-	provided "com.android.support:support-v4:$rootProject.ext.supportLibraryVersion"
-}

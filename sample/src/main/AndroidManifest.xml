@@ -11,8 +11,7 @@
 		android:supportsRtl="true"
 		android:theme="@style/AppTheme">
 
-		<activity android:name=".RoundImageViewActivity"
-				  android:hardwareAccelerated="true">
+		<activity android:name=".BaseSampleActivity">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN"/>
 				<category android:name="android.intent.category.LAUNCHER"/>

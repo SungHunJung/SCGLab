@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
 import android.widget.Toast;
 
 import com.scglab.common.adapter.LabelItem;
@@ -56,14 +57,14 @@ public class SelectModeSampleActivity extends AppCompatActivity {
 	private final OnItemClickEventHandler onItemClickEventHandler = new OnItemClickEventHandler() {
 
 		@Override
-		public void onItemClick(Object item) {
+		public void onItemClick(Object item, View rendererView) {
 			showToast("click : " + item.toString());
 
 			if (flexAdapter.isSelectMode()) flexAdapter.toggleSelectItem(item);
 		}
 
 		@Override
-		public void onItemLongClick(Object item) {
+		public void onItemLongClick(Object item, View rendererView) {
 			boolean mode = !flexAdapter.isSelectMode();
 			List<Object> selectedItemList = flexAdapter.getSelectedItemList();
 			flexAdapter.setSelectMode(mode, true);
@@ -72,14 +73,14 @@ public class SelectModeSampleActivity extends AppCompatActivity {
 		}
 
 		@Override
-		public void onChildViewClick(Object item, int viewId) {
+		public void onChildViewClick(Object item, View rendererView, int viewId) {
 			showToast("child click : " + item.toString() + "/" + viewId);
 
 			if (viewId == R.id.cbSelect && flexAdapter.isSelectMode()) flexAdapter.toggleSelectItem(item);
 		}
 
 		@Override
-		public void onChildViewLongClick(Object item, int viewId) {
+		public void onChildViewLongClick(Object item, View rendererView, int viewId) {
 			showToast("child long click : " + item.toString() + "/" + viewId);
 		}
 	};

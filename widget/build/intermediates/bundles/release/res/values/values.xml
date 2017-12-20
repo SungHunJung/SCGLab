@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr format="reference" name="emptyImage"/>
+    <attr format="boolean" name="showRealImageSize"/>
+    <declare-styleable name="CircleImageView"><attr name="emptyImage"/><attr format="integer" name="circleSize"/><attr format="color" name="frameColor"/><attr format="integer" name="frameStroke"/></declare-styleable>
+    <declare-styleable name="NetworkImageView"><attr name="emptyImage"/><attr name="showRealImageSize"/></declare-styleable>
+    <declare-styleable name="RoundImageView"><attr name="emptyImage"/><attr name="showRealImageSize"/><attr format="float" name="cornerSize"/><attr format="float" name="cornerSizeTopLeft"/><attr format="float" name="cornerSizeTopRight"/><attr format="float" name="cornerSizeBottomRight"/><attr format="float" name="cornerSizeBottomLeft"/><attr format="float" name="maxSize"/><attr format="float" name="minSize"/></declare-styleable>
+    <string name="app_name">widget</string>
+</resources>
