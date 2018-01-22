@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+	<declare-styleable name="RoundedImageView">
+		<attr name="default_image" format="reference"/>
+		<attr name="scale_up" format="boolean"/>
+		<attr name="corner_size" format="float"/>
+		<attr name="top_left_corner_size" format="float"/>
+		<attr name="top_right_corner_size" format="float"/>
+		<attr name="bottom_right_corner_size" format="float"/>
+		<attr name="bottom_left_corner_size" format="float"/>
+	</declare-styleable>
+
+	<attr name="emptyImage" format="reference"/>
+	<attr name="showRealImageSize" format="boolean"/>
+
+	<declare-styleable name="NetworkImageView">
+		<attr name="emptyImage"/>
+		<attr name="showRealImageSize"/>
+	</declare-styleable>
+
+	<declare-styleable name="CircleImageView">
+		<attr name="emptyImage"/>
+		<attr name="circleSize" format="integer"/>
+		<attr name="frameColor" format="color"/>
+		<attr name="frameStroke" format="integer"/>
+	</declare-styleable>
+
+	<declare-styleable name="RoundImageView">
+		<attr name="emptyImage"/>
+		<attr name="showRealImageSize"/>
+		<attr name="cornerSize" format="float"/>
+		<attr name="cornerSizeTopLeft" format="float"/>
+		<attr name="cornerSizeTopRight" format="float"/>
+		<attr name="cornerSizeBottomRight" format="float"/>
+		<attr name="cornerSizeBottomLeft" format="float"/>
+		<attr name="maxSize" format="float"/>
+		<attr name="minSize" format="float"/>
+	</declare-styleable>
+
+</resources>
