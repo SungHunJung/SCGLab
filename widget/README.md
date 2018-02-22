@@ -8,7 +8,7 @@ repositories {
 }
 
 dependencies {
-  compile 'com.scglab.common:util:1.1.1'
+  compile 'com.scglab.common:widget:1.1.22'
 }
 ```
 history

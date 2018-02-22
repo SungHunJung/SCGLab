@@ -35,11 +35,11 @@ public class MultipleTypeSampleActivity extends AppCompatActivity {
 		recyclerView.setAdapter(flexAdapter);
 
 		//add items
-		for (int index = 0; index < 20; index++) {
+		for (int index = 0; index < 50; index++) {
 			flexAdapter.addItem(new LabelItem(String.valueOf(index)));
 		}
-		flexAdapter.addItem(5, new UrlItem("https://www.android.com/static/2016/img/logo-android-green_2x.png"));
-		flexAdapter.addItem(10, new UrlItem("https://developer.android.com/images/brand/Android_Robot_200.png"));
-		flexAdapter.addItem(15, new UrlItem("https://play.google.com/intl/en_us/badges/images/play-logo-2x.png"));
+		flexAdapter.addItem(1, new UrlItem("https://www.android.com/static/2016/img/logo-android-green_2x.png"));
+		flexAdapter.addItem(21, new UrlItem("https://developer.android.com/images/brand/Android_Robot_200.png"));
+		flexAdapter.addItem(41, new UrlItem("https://play.google.com/intl/en_us/badges/images/play-logo-2x.png"));
 	}
 }

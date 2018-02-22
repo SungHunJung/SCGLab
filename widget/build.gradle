@@ -1,5 +1,11 @@
 apply from: '../lib.gradle'
 
+android {
+	lintOptions {
+		abortOnError false
+	}
+}
+
 dependencies {
 	provided "com.android.support:appcompat-v7:$rootProject.ext.supportLibraryVersion"
 	provided project(':util')

@@ -1,5 +1,6 @@
 package com.scglab.common.widget;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
@@ -10,13 +11,15 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.View;
-import android.view.ViewGroup;
 
 import java.util.Arrays;
+
+import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 
 /**
  * Created by sunghun on 2017.
@@ -42,6 +45,7 @@ public class RoundedImageView extends View {
 		init(context.getTheme().obtainStyledAttributes(attrs, R.styleable.RoundedImageView, defStyleAttr, 0));
 	}
 
+	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 	public RoundedImageView(Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
 		super(context, attrs, defStyleAttr, defStyleRes);
 		init(context.getTheme().obtainStyledAttributes(attrs, R.styleable.RoundedImageView, defStyleAttr, defStyleRes));
@@ -53,12 +57,20 @@ public class RoundedImageView extends View {
 		int height = getDefaultSize(getSuggestedMinimumHeight(), heightMeasureSpec);
 
 		if (source.hasSource()) {
-			if (getLayoutParams().width == ViewGroup.LayoutParams.WRAP_CONTENT) {
-				width = Math.min(source.getSourceWidth(getResources()), width);
+			if (getLayoutParams().width == WRAP_CONTENT) {
+				width = source.getSourceWidth(getResources());
 			}
 
-			if (getLayoutParams().height == ViewGroup.LayoutParams.WRAP_CONTENT) {
-				height = Math.min(source.getSourceHeight(getResources()), height);
+			if (getLayoutParams().height == WRAP_CONTENT) {
+				height = source.getSourceHeight(getResources());
+			}
+
+			if (getLayoutParams().width != WRAP_CONTENT && getLayoutParams().height == WRAP_CONTENT) {
+				float rate = (float) source.getSourceHeight(getResources()) / (float) source.getSourceWidth(getResources());
+				height = Math.min((int) (rate * (float) width), height);
+			} else if (getLayoutParams().width == WRAP_CONTENT && getLayoutParams().height != WRAP_CONTENT) {
+				float rate = (float) source.getSourceWidth(getResources()) / (float) source.getSourceHeight(getResources());
+				width = Math.min((int) (rate * (float) height), width);
 			}
 		}
 
@@ -83,6 +95,7 @@ public class RoundedImageView extends View {
 
 	public void setBitmap(@NonNull Bitmap bitmap) {
 		source.setSource(bitmap);
+		requestLayout();
 		invalidate();
 	}
 
@@ -119,7 +132,7 @@ public class RoundedImageView extends View {
 		cornerSize.setBottomLeft(typedArray.getFloat(R.styleable.RoundedImageView_bottom_left_corner_size, base) * density);
 
 		source = new Source(typedArray.getResourceId(R.styleable.RoundedImageView_default_image, -1));
-		source.setScaleUp(typedArray.getBoolean(R.styleable.RoundedImageView_scale_up, false));
+		source.setScaleUp(typedArray.getBoolean(R.styleable.RoundedImageView_scale_up, true));
 		source.setCornerSize(cornerSize.toArray());
 
 		try {
@@ -222,7 +235,7 @@ public class RoundedImageView extends View {
 		}
 
 		int getSourceWidth(@NonNull Resources resources) {
-			return getSource(resources).getHeight();
+			return getSource(resources).getWidth();
 		}
 
 		int getSourceHeight(@NonNull Resources resources) {
@@ -340,7 +353,7 @@ public class RoundedImageView extends View {
 		}
 
 		private Bitmap getSource(Resources resources) {
-			if (null == bitmap || hasSource()) {
+			if (null == bitmap && hasSource()) {
 				bitmap = BitmapFactory.decodeResource(resources, DEFAULT_RES);
 			}
 
@@ -354,12 +367,14 @@ public class RoundedImageView extends View {
 			invalidateCanvasRect = true;
 			invalidateClipPath = true;
 
-			try {
-				bitmap.recycle();
-			} catch (Exception ignored) {
-			} finally {
-				bitmap = null;
-			}
+			// TODO: 2018. 2. 21. pool으로 관리할 경우.. recycle하면 안됨
+//			try {
+//				bitmap.recycle();
+//			} catch (Exception ignored) {
+//			} finally {
+//				bitmap = null;
+//			}
+			bitmap = null;
 		}
 
 	}
