@@ -131,6 +131,16 @@ public class FlexAdapter extends RecyclerView.Adapter<ItemRenderer> implements F
 		return null;
 	}
 
+	int getRecyclerViewWidth() {
+		if (null == recyclerView) return -1;
+		return recyclerView.getWidth();
+	}
+
+	int getRecyclerViewHeight() {
+		if (null == recyclerView) return -1;
+		return recyclerView.getHeight();
+	}
+
 	//----------------------------------------
 	// model
 	//----------------------------------------

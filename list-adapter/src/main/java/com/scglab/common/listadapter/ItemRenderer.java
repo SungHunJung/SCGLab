@@ -172,6 +172,14 @@ public abstract class ItemRenderer<T> extends RecyclerView.ViewHolder {
 		flexAdapter.setFilter(filterClass);
 	}
 
+	protected final int getRecyclerViewWidth() {
+		return flexAdapter.getRecyclerViewWidth();
+	}
+
+	protected final int getRecyclerViewHeight() {
+		return flexAdapter.getRecyclerViewHeight();
+	}
+
 	//----------------------------------------
 	// click event
 	//----------------------------------------
