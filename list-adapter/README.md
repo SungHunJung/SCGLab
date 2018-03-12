@@ -76,7 +76,7 @@ repositories {
 }
 
 dependencies {
-    compile 'com.scglab.common:list-adapter:1.2.22'
+    compile 'com.scglab.common:list-adapter:1.2.3'
 }
 ```
 history
