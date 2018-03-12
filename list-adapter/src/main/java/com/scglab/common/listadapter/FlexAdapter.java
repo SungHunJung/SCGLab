@@ -1,6 +1,7 @@
 package com.scglab.common.listadapter;
 
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Filter;
@@ -15,6 +16,7 @@ import java.lang.annotation.Target;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -43,11 +45,24 @@ public class FlexAdapter extends RecyclerView.Adapter<ItemRenderer> implements F
 	@Override
 	public ItemRenderer onCreateViewHolder(ViewGroup parent, int viewType) {
 		recyclerView = (RecyclerView) parent;
+
+		if (itemTouchHelperCallback == null) {
+			recyclerView.post(new Runnable() {
+				@Override
+				public void run() {
+					if (null != itemTouchHelperCallback) return;
+					itemTouchHelperCallback = new ItemTouchHelperCallback();
+					itemTouchHelper = new ItemTouchHelper(itemTouchHelperCallback);
+					itemTouchHelper.attachToRecyclerView(recyclerView);
+				}
+			});
+		}
+
 		return RENDERER_FACTORY.createItemRenderer(parent, viewType);
 	}
 
 	@Override
-	public void onBindViewHolder(ItemRenderer holder, int position) {
+	public void onBindViewHolder(final ItemRenderer holder, int position) {
 		holder.flexAdapter = this;
 		holder.onClickListener = onClickListener;
 		holder.onLongClickListener = onLongClickListener;
@@ -225,6 +240,21 @@ public class FlexAdapter extends RecyclerView.Adapter<ItemRenderer> implements F
 		}
 	}
 
+	public boolean swapItem(int fromPosition, int toPosition) {
+		if (fromPosition < toPosition) {
+			for (int i = fromPosition; i < toPosition; i++) {
+				Collections.swap(ITEM_STORAGE, i, i + 1);
+			}
+		} else {
+			for (int i = fromPosition; i > toPosition; i--) {
+				Collections.swap(ITEM_STORAGE, i, i - 1);
+			}
+		}
+
+		notifyItemMoved(fromPosition, toPosition);
+		return true;
+	}
+
 	//----------------------------------------
 	// notify
 	//----------------------------------------
@@ -387,4 +417,109 @@ public class FlexAdapter extends RecyclerView.Adapter<ItemRenderer> implements F
 	private boolean isItemView(View view) {
 		return view.getLayoutParams() instanceof RecyclerView.LayoutParams;
 	}
+
+	//----------------------------------------
+	// itemDrag
+	//----------------------------------------
+
+	private boolean itemDrag = false;
+
+	public boolean isItemDrag() {
+		return itemDrag;
+	}
+
+	public void setItemDrag(boolean itemDrag) {
+		this.itemDrag = itemDrag;
+	}
+
+	private OnItemDragAndDrop onItemDragAndDrop;
+
+	public OnItemDragAndDrop getOnItemDragAndDrop() {
+		return onItemDragAndDrop;
+	}
+
+	public void setOnItemDragAndDrop(OnItemDragAndDrop onItemDragAndDrop) {
+		this.onItemDragAndDrop = onItemDragAndDrop;
+	}
+
+	public interface OnItemDragAndDrop {
+		void onChanged(int fromPosition, int toPosition);
+	}
+
+	//----------------------------------------
+	// itemSwipe
+	//----------------------------------------
+
+	private boolean itemSwipe = false;
+
+	public boolean isItemSwipe() {
+		return itemSwipe;
+	}
+
+	public void setItemSwipe(boolean itemSwipe) {
+		this.itemSwipe = itemSwipe;
+	}
+
+	private OnItemSwipe onItemSwipe;
+
+	public OnItemSwipe getOnItemSwipe() {
+		return onItemSwipe;
+	}
+
+	public void setOnItemSwipe(OnItemSwipe onItemSwipe) {
+		this.onItemSwipe = onItemSwipe;
+	}
+
+	public interface OnItemSwipe {
+		void onDeleted(int position);
+	}
+	//----------------------------------------
+	// ItemTouchHelper
+	//----------------------------------------
+
+	ItemTouchHelper itemTouchHelper;
+	private ItemTouchHelperCallback itemTouchHelperCallback;
+
+	public class ItemTouchHelperCallback extends ItemTouchHelper.Callback {
+
+		private ItemTouchHelperCallback() {
+		}
+
+		@Override
+		public boolean isLongPressDragEnabled() {
+			return itemDrag;
+		}
+
+		@Override
+		public boolean isItemViewSwipeEnabled() {
+			return itemSwipe;
+		}
+
+		@Override
+		public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
+			int dragFlags = ItemTouchHelper.UP | ItemTouchHelper.DOWN;
+			int swipeFlags = ItemTouchHelper.START | ItemTouchHelper.END;
+			return makeMovementFlags(dragFlags, swipeFlags);
+		}
+
+		@Override
+		public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+			final int from = viewHolder.getAdapterPosition();
+			final int to = target.getAdapterPosition();
+
+			swapItem(viewHolder.getAdapterPosition(), target.getAdapterPosition());
+			if (null != onItemDragAndDrop) onItemDragAndDrop.onChanged(from, to);
+
+			return true;
+		}
+
+		@Override
+		public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+			final int position = viewHolder.getAdapterPosition();
+
+			removeItem(position);
+			if (null != onItemSwipe) onItemSwipe.onDeleted(position);
+		}
+	}
+
 }

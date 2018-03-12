@@ -1,7 +1,9 @@
 package com.scglab.common.listadapter;
 
 import android.content.Context;
+import android.support.v4.view.MotionEventCompat;
 import android.support.v7.widget.RecyclerView;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Filter;
 
@@ -209,5 +211,32 @@ public abstract class ItemRenderer<T> extends RecyclerView.ViewHolder {
 
 		view.setOnLongClickListener(null);
 		view.setLongClickable(false);
+	}
+
+	//----------------------------------------
+	// drag event
+	//----------------------------------------
+
+	private final View.OnTouchListener onTouchListener = new View.OnTouchListener() {
+		@Override
+		public boolean onTouch(View v, MotionEvent event) {
+			if (MotionEventCompat.getActionMasked(event) == MotionEvent.ACTION_DOWN) {
+				flexAdapter.itemTouchHelper.startDrag(ItemRenderer.this);
+			}
+			return false;
+		}
+	};
+
+	private View dragView;
+
+	protected void setDragView(int resId) {
+		setDragView(findViewById(resId));
+	}
+
+	protected void setDragView(View view) {
+		if (null != dragView) dragView.setOnTouchListener(null);
+
+		dragView = view;
+		dragView.setOnTouchListener(onTouchListener);
 	}
 }
