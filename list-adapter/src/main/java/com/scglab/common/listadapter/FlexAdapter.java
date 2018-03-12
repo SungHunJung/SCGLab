@@ -2,6 +2,7 @@ package com.scglab.common.listadapter;
 
 import android.graphics.Canvas;
 import android.graphics.RectF;
+import android.support.annotation.IntDef;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.View;
@@ -477,7 +478,16 @@ public class FlexAdapter extends RecyclerView.Adapter<ItemRenderer> implements F
 	}
 
 	public interface OnItemSwipe {
-		boolean onSwipe(Object item);
+		@IntDef({REMOVE_ITEM, RESTORE_ITEM, HOLD_ITEM})
+		@interface AfterAction {
+		}
+
+		int REMOVE_ITEM = 1;
+		int RESTORE_ITEM = 2;
+		int HOLD_ITEM = 3;
+
+		@AfterAction
+		int onSwipe(Object item);
 	}
 
 	//----------------------------------------
@@ -528,8 +538,20 @@ public class FlexAdapter extends RecyclerView.Adapter<ItemRenderer> implements F
 			if (null == item) return;
 
 			if (null != onItemSwipe) {
-				if (onItemSwipe.onSwipe(item)) removeItem(item);
-				else notifyItemChanged(position);
+				final int result = onItemSwipe.onSwipe(item);
+				switch (result) {
+					case OnItemSwipe.REMOVE_ITEM:
+						removeItem(item);
+						break;
+
+					case OnItemSwipe.RESTORE_ITEM:
+						notifyItemChanged(position);
+						break;
+
+					case OnItemSwipe.HOLD_ITEM:
+						break;
+
+				}
 			} else {
 				removeItem(item);
 			}
@@ -542,8 +564,17 @@ public class FlexAdapter extends RecyclerView.Adapter<ItemRenderer> implements F
 
 			if (null != onChildDraw) {
 				RectF rect;
-				if (dX > 0) rect = new RectF(0, viewHolder.itemView.getTop(), dX, viewHolder.itemView.getBottom());
-				else rect = new RectF(viewHolder.itemView.getRight() + dX, viewHolder.itemView.getTop(), viewHolder.itemView.getRight(), viewHolder.itemView.getBottom());
+
+				int leftMargin = 0;
+				int rightMargin = 0;
+				if (viewHolder.itemView.getLayoutParams() instanceof ViewGroup.MarginLayoutParams) {
+					ViewGroup.MarginLayoutParams layoutParams = (ViewGroup.MarginLayoutParams) viewHolder.itemView.getLayoutParams();
+					leftMargin = layoutParams.leftMargin;
+					rightMargin = layoutParams.rightMargin;
+				}
+
+				if (dX > 0) rect = new RectF(viewHolder.itemView.getLeft() - leftMargin, viewHolder.itemView.getTop(), dX + leftMargin, viewHolder.itemView.getBottom());
+				else rect = new RectF(viewHolder.itemView.getRight() + dX, viewHolder.itemView.getTop(), viewHolder.itemView.getRight() + rightMargin, viewHolder.itemView.getBottom());
 				onChildDraw.onDraw(c, rect, getItem(position), dX, actionState, isCurrentlyActive);
 			}
 

@@ -28,6 +28,14 @@ public class MultipleTypeSampleActivity extends AppCompatActivity {
 
 		//adapter
 		FlexAdapter flexAdapter = new FlexAdapter(rendererFactory);
+		flexAdapter.setOnItemSwipe(new FlexAdapter.OnItemSwipe() {
+			@Override
+			public int onSwipe(Object item) {
+				if (item instanceof UrlItem) return FlexAdapter.OnItemSwipe.RESTORE_ITEM;
+				else return FlexAdapter.OnItemSwipe.REMOVE_ITEM;
+			}
+		});
+		flexAdapter.setItemSwipe(true);
 
 		//recyclerView
 		RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
