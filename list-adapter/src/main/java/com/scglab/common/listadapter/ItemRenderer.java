@@ -237,6 +237,6 @@ public abstract class ItemRenderer<T> extends RecyclerView.ViewHolder {
 		if (null != dragView) dragView.setOnTouchListener(null);
 
 		dragView = view;
-		dragView.setOnTouchListener(onTouchListener);
+		if (null != dragView) dragView.setOnTouchListener(onTouchListener);
 	}
 }

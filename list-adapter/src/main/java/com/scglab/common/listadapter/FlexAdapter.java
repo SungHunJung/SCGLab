@@ -439,17 +439,17 @@ public class FlexAdapter extends RecyclerView.Adapter<ItemRenderer> implements F
 		this.itemDrag = itemDrag;
 	}
 
-	private OnItemDragAndDrop onItemDragAndDrop;
+	private OnItemDragAndDropHandler onItemDragAndDropHandler;
 
-	public OnItemDragAndDrop getOnItemDragAndDrop() {
-		return onItemDragAndDrop;
+	public OnItemDragAndDropHandler getOnItemDragAndDrop() {
+		return onItemDragAndDropHandler;
 	}
 
-	public void setOnItemDragAndDrop(OnItemDragAndDrop onItemDragAndDrop) {
-		this.onItemDragAndDrop = onItemDragAndDrop;
+	public void setOnItemDragAndDropHandler(OnItemDragAndDropHandler handler) {
+		onItemDragAndDropHandler = handler;
 	}
 
-	public interface OnItemDragAndDrop {
+	public interface OnItemDragAndDropHandler {
 		void onChanged(int fromPosition, int toPosition);
 	}
 
@@ -467,17 +467,17 @@ public class FlexAdapter extends RecyclerView.Adapter<ItemRenderer> implements F
 		this.itemSwipe = itemSwipe;
 	}
 
-	private OnItemSwipe onItemSwipe;
+	private OnItemSwipeHandler onItemSwipeHandler;
 
-	public OnItemSwipe getOnItemSwipe() {
-		return onItemSwipe;
+	public OnItemSwipeHandler getOnItemSwipeHandler() {
+		return onItemSwipeHandler;
 	}
 
-	public void setOnItemSwipe(OnItemSwipe onItemSwipe) {
-		this.onItemSwipe = onItemSwipe;
+	public void setOnItemSwipe(OnItemSwipeHandler handler) {
+		onItemSwipeHandler = handler;
 	}
 
-	public interface OnItemSwipe {
+	public interface OnItemSwipeHandler {
 		@IntDef({REMOVE_ITEM, RESTORE_ITEM, HOLD_ITEM})
 		@interface AfterAction {
 		}
@@ -525,7 +525,7 @@ public class FlexAdapter extends RecyclerView.Adapter<ItemRenderer> implements F
 			final int to = target.getAdapterPosition();
 
 			swapItem(viewHolder.getAdapterPosition(), target.getAdapterPosition());
-			if (null != onItemDragAndDrop) onItemDragAndDrop.onChanged(from, to);
+			if (null != onItemDragAndDropHandler) onItemDragAndDropHandler.onChanged(from, to);
 
 			return true;
 		}
@@ -537,18 +537,18 @@ public class FlexAdapter extends RecyclerView.Adapter<ItemRenderer> implements F
 
 			if (null == item) return;
 
-			if (null != onItemSwipe) {
-				final int result = onItemSwipe.onSwipe(item);
+			if (null != onItemSwipeHandler) {
+				final int result = onItemSwipeHandler.onSwipe(item);
 				switch (result) {
-					case OnItemSwipe.REMOVE_ITEM:
+					case OnItemSwipeHandler.REMOVE_ITEM:
 						removeItem(item);
 						break;
 
-					case OnItemSwipe.RESTORE_ITEM:
+					case OnItemSwipeHandler.RESTORE_ITEM:
 						notifyItemChanged(position);
 						break;
 
-					case OnItemSwipe.HOLD_ITEM:
+					case OnItemSwipeHandler.HOLD_ITEM:
 						break;
 
 				}
@@ -562,7 +562,7 @@ public class FlexAdapter extends RecyclerView.Adapter<ItemRenderer> implements F
 			final int position = viewHolder.getAdapterPosition();
 			if (position == -1) return;
 
-			if (null != onChildDraw) {
+			if (null != onChildDrawer) {
 				RectF rect;
 
 				int leftMargin = 0;
@@ -575,7 +575,7 @@ public class FlexAdapter extends RecyclerView.Adapter<ItemRenderer> implements F
 
 				if (dX > 0) rect = new RectF(viewHolder.itemView.getLeft() - leftMargin, viewHolder.itemView.getTop(), dX + leftMargin, viewHolder.itemView.getBottom());
 				else rect = new RectF(viewHolder.itemView.getRight() + dX, viewHolder.itemView.getTop(), viewHolder.itemView.getRight() + rightMargin, viewHolder.itemView.getBottom());
-				onChildDraw.onDraw(c, rect, getItem(position), dX, actionState, isCurrentlyActive);
+				onChildDrawer.onDraw(c, rect, getItem(position), dX, actionState, isCurrentlyActive);
 			}
 
 			super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
@@ -588,20 +588,20 @@ public class FlexAdapter extends RecyclerView.Adapter<ItemRenderer> implements F
 	}
 
 	//----------------------------------------
-	// OnChildDraw
+	// OnChildDrawer
 	//----------------------------------------
 
-	private OnChildDraw onChildDraw;
+	private OnChildDrawer onChildDrawer;
 
-	public OnChildDraw getOnChildDraw() {
-		return onChildDraw;
+	public OnChildDrawer getOnChildDraw() {
+		return onChildDrawer;
 	}
 
-	public void setOnChildDraw(OnChildDraw onChildDraw) {
-		this.onChildDraw = onChildDraw;
+	public void setOnChildDraw(OnChildDrawer onChildDrawer) {
+		this.onChildDrawer = onChildDrawer;
 	}
 
-	public interface OnChildDraw {
+	public interface OnChildDrawer {
 		void onDraw(Canvas canvas, RectF rect, Object item, float dX, int actionState, boolean isCurrentlyActive);
 	}
 
