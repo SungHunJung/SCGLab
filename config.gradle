@@ -8,7 +8,7 @@ ext {
 	versionCode = 2
 //	libVersionName = '1.1.22' //widget
 //	libVersionName = '1.1.0' //util
-	libVersionName = '1.2.0' //list-adapter
+	libVersionName = '1.2.2' //list-adapter
 
 	//bintray setting info
 	repositoryName = 'scglab'

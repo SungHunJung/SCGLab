@@ -5,10 +5,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
-import com.scglab.common.adapter.UrlItem;
 import com.scglab.common.adapter.ImageRenderer;
 import com.scglab.common.adapter.LabelItem;
 import com.scglab.common.adapter.LabelRenderer;
+import com.scglab.common.adapter.UrlItem;
 import com.scglab.common.listadapter.FlexAdapter;
 import com.scglab.common.listadapter.RendererFactory;
 

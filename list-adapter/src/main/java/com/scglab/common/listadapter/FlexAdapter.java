@@ -1,5 +1,7 @@
 package com.scglab.common.listadapter;
 
+import android.graphics.Canvas;
+import android.graphics.RectF;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.View;
@@ -203,16 +205,20 @@ public class FlexAdapter extends RecyclerView.Adapter<ItemRenderer> implements F
 		notifyItemInserted(ITEM_STORAGE.size());
 	}
 
-	public void removeItem(Object item) {
+	public Object removeItem(Object item) {
 		int position = getItemPosition(item);
-		removeItem(position);
+		return removeItem(position);
 	}
 
-	public void removeItem(int position) {
+	public Object removeItem(int position) {
+		Object item = null;
+
 		if (position != -1) {
-			ITEM_STORAGE.remove(position);
+			item = ITEM_STORAGE.remove(position);
 			notifyItemRemoved(position);
 		}
+
+		return item;
 	}
 
 	public void removeItems(int start, int end) {
@@ -471,8 +477,9 @@ public class FlexAdapter extends RecyclerView.Adapter<ItemRenderer> implements F
 	}
 
 	public interface OnItemSwipe {
-		void onDeleted(int position);
+		boolean onSwipe(Object item);
 	}
+
 	//----------------------------------------
 	// ItemTouchHelper
 	//----------------------------------------
@@ -516,10 +523,55 @@ public class FlexAdapter extends RecyclerView.Adapter<ItemRenderer> implements F
 		@Override
 		public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
 			final int position = viewHolder.getAdapterPosition();
+			final Object item = getItem(position);
 
-			removeItem(position);
-			if (null != onItemSwipe) onItemSwipe.onDeleted(position);
+			if (null == item) return;
+
+			if (null != onItemSwipe) {
+				if (onItemSwipe.onSwipe(item)) removeItem(item);
+				else notifyItemChanged(position);
+			} else {
+				removeItem(item);
+			}
 		}
+
+		@Override
+		public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
+			final int position = viewHolder.getAdapterPosition();
+			if (position == -1) return;
+
+			if (null != onChildDraw) {
+				RectF rect;
+				if (dX > 0) rect = new RectF(0, viewHolder.itemView.getTop(), dX, viewHolder.itemView.getBottom());
+				else rect = new RectF(viewHolder.itemView.getRight() + dX, viewHolder.itemView.getTop(), viewHolder.itemView.getRight(), viewHolder.itemView.getBottom());
+				onChildDraw.onDraw(c, rect, getItem(position), dX, actionState, isCurrentlyActive);
+			}
+
+			super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+		}
+
+		@Override
+		public void onChildDrawOver(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
+			super.onChildDrawOver(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+		}
+	}
+
+	//----------------------------------------
+	// OnChildDraw
+	//----------------------------------------
+
+	private OnChildDraw onChildDraw;
+
+	public OnChildDraw getOnChildDraw() {
+		return onChildDraw;
+	}
+
+	public void setOnChildDraw(OnChildDraw onChildDraw) {
+		this.onChildDraw = onChildDraw;
+	}
+
+	public interface OnChildDraw {
+		void onDraw(Canvas canvas, RectF rect, Object item, float dX, int actionState, boolean isCurrentlyActive);
 	}
 
 }
