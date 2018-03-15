@@ -4,6 +4,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.scglab.common.listadapter.ItemRenderer;
+import com.scglab.common.listadapter.TypeStore;
 
 /**
  * Created by shj on 2017. 9. 11..

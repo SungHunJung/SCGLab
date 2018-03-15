@@ -119,7 +119,7 @@ public class FlexAdapter extends RecyclerView.Adapter<ItemRenderer> implements F
 			if (method.isAnnotationPresent(TypeStore.DefineItem.class)) {
 				try {
 					return (int) method.invoke(item);
-				} catch (Exception ignored) {
+				} catch(Exception ignored){
 				}
 			}
 		}
@@ -514,6 +514,7 @@ public class FlexAdapter extends RecyclerView.Adapter<ItemRenderer> implements F
 
 		@Override
 		public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
+			// TODO: 2018. 3. 13. 특정 viewholder만 이동 가능 하도록
 			int dragFlags = ItemTouchHelper.UP | ItemTouchHelper.DOWN;
 			int swipeFlags = ItemTouchHelper.START | ItemTouchHelper.END;
 			return makeMovementFlags(dragFlags, swipeFlags);
@@ -575,7 +576,10 @@ public class FlexAdapter extends RecyclerView.Adapter<ItemRenderer> implements F
 
 				if (dX > 0) rect = new RectF(viewHolder.itemView.getLeft() - leftMargin, viewHolder.itemView.getTop(), dX + leftMargin, viewHolder.itemView.getBottom());
 				else rect = new RectF(viewHolder.itemView.getRight() + dX, viewHolder.itemView.getTop(), viewHolder.itemView.getRight() + rightMargin, viewHolder.itemView.getBottom());
-				onChildDrawer.onDraw(c, rect, getItem(position), dX, actionState, isCurrentlyActive);
+				rect.left = Math.max(0, rect.left);
+				rect.right = Math.min(c.getWidth(), rect.right);
+
+				onChildDrawer.onDraw(c, recyclerView, viewHolder, rect, getItem(position), dX, dY, actionState, isCurrentlyActive);
 			}
 
 			super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
@@ -602,7 +606,9 @@ public class FlexAdapter extends RecyclerView.Adapter<ItemRenderer> implements F
 	}
 
 	public interface OnChildDrawer {
-		void onDraw(Canvas canvas, RectF rect, Object item, float dX, int actionState, boolean isCurrentlyActive);
+		void onDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RectF rect, Object item, float dX, float dY, int actionState, boolean isCurrentlyActive);
+
+//		void onDetached(RecyclerView.ViewHolder viewHolder, Object item); //이걸 어찌 하리오
 	}
 
 }

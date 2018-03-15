@@ -7,8 +7,6 @@ import android.view.ViewGroup;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.util.Hashtable;
 
 /**
@@ -93,7 +91,7 @@ public class RendererFactory extends Hashtable<Integer, RendererFactory.Structur
 		}
 	}
 
-	static class StructureObject {
+	public static class StructureObject {
 		private final int LAYOUT;
 		private final Class VIEW_HOLDER;
 
