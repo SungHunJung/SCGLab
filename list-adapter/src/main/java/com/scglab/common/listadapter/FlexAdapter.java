@@ -165,7 +165,7 @@ public class FlexAdapter extends RecyclerView.Adapter<ItemRenderer> implements F
 
 	private final ItemStore ITEM_STORAGE;
 
-	public void setModels(List<Object> list) {
+	public void setModels(List<?> list) {
 		ITEM_STORAGE.clear();
 		ITEM_STORAGE.addAll(list);
 		notifyDataSetChanged();
