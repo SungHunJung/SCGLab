@@ -119,7 +119,7 @@ public class FlexAdapter extends RecyclerView.Adapter<ItemRenderer> implements F
 			if (method.isAnnotationPresent(TypeStore.DefineItem.class)) {
 				try {
 					return (int) method.invoke(item);
-				} catch(Exception ignored){
+				} catch (Exception ignored) {
 				}
 			}
 		}
@@ -400,7 +400,9 @@ public class FlexAdapter extends RecyclerView.Adapter<ItemRenderer> implements F
 		public void onClick(View view) {
 			if (null == onItemClickEventHandler) return;
 
-			final Object item = getItem(getViewPosition(view));
+			int position = getViewPosition(view);
+			if (position == -1) return;
+			final Object item = getItem(position);
 
 			if (isItemView(view)) onItemClickEventHandler.onItemClick(item, view);
 			else onItemClickEventHandler.onChildViewClick(item, getItemView(view), view.getId());
@@ -412,7 +414,9 @@ public class FlexAdapter extends RecyclerView.Adapter<ItemRenderer> implements F
 		public boolean onLongClick(View view) {
 			if (null == onItemClickEventHandler) return true;
 
-			final Object item = getItem(getViewPosition(view));
+			int position = getViewPosition(view);
+			if (position == -1) return false;
+			final Object item = getItem(position);
 
 			if (isItemView(view)) onItemClickEventHandler.onItemLongClick(item, view);
 			else onItemClickEventHandler.onChildViewLongClick(item, getItemView(view), view.getId());
