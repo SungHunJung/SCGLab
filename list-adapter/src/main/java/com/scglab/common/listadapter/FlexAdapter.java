@@ -243,7 +243,7 @@ public class FlexAdapter extends RecyclerView.Adapter<ItemRenderer> implements F
 		if (position != -1) {
 			ITEM_STORAGE.remove(position);
 			ITEM_STORAGE.add(position, newItem);
-			notifyItemChanged(position);
+			notifyItemChanged(newItem);
 		}
 	}
 
